@@ -1,6 +1,6 @@
 /* Thang Gợi Mở — cất app vào máy để mất mạng vẫn mở được.
    Đổi số BAN mỗi lần cập nhật app để máy HS lấy bản mới. */
-const BAN = 'tgm-v1';
+const BAN = 'tgm-v2';
 const TEP = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png', './apple-touch-icon.png'];
 self.addEventListener('install', e => { e.waitUntil(caches.open(BAN).then(c => c.addAll(TEP))); self.skipWaiting(); });
 self.addEventListener('activate', e => {

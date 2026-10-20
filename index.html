@@ -430,7 +430,7 @@ const coAppsScript = () => !!(window.google && google.script && google.script.ru
 /* Bản cài màn hình chính (GitHub Pages…) KHÔNG tự gửi gì lên mạng: mất mạng thì cất bài vào máy HS;
    có mạng, HS bấm «Gửi bài đã cất» → mở trang Apps Script của thầy cô (link /exec), chính trang đó nộp như thường. */
 const API_GOC = "https://script.google.com/macros/s/AKfycbzDHbk2fJb_zUANBMdL6buLCw6kyq_NLbX7cs2aKhg9yTkoMaHHLzDple5HWPxujGJz/exec";
-const BAN_CAI = "";   // link bản cài màn hình chính, VD https://ten.github.io/thang-goi-mo/ — điền khi đã đưa lên
+const BAN_CAI = "https://hannaduong040921-maker.github.io/Scaffolding-LVD/";   // link bản cài màn hình chính, VD https://ten.github.io/thang-goi-mo/ — điền khi đã đưa lên
 const coMayChu = () => coAppsScript();
 const coDuongGui = () => coAppsScript() || !!API_GOC;
 const laWebCai = () => location.protocol === "https:" && !/(google\.com|googleusercontent\.com)$/.test(location.hostname) || location.hostname === "localhost";

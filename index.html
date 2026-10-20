@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Thang Gợi Mở · Socratic Mind Mentor 3.0</title>
+<meta name="theme-color" content="#2457d6">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Thang Gợi Mở">
+<!--
+  THANG GỢI MỞ — Socratic Mind Mentor 3.0
+  Phân hiệu Hùng Tiến · Trường THCS Kim Sơn (Ninh Bình) · lõi Tiếng Anh 6–9 (Global Success), mở cho mọi môn
+  ✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng.
+  Một file, chạy không cần mạng, không đăng nhập, không gọi AI từ máy học sinh
+  (bản 2 gọi Gemini mỗi câu chat → hết hạn mức 20 lượt/ngày → lỗi "quá tải").
+  Khi đặt trong Google Apps Script (xem apps-script/HUONG-DAN.md) có thêm nút «Nộp thẳng cho cô».
+  Chế độ chụp: #trang-chu · #viet&bai=g8u1&mau=1 · #kiem&bai=g8u1&mau=1 · #nop&mau=1 · #gv&mau=1 · #phat-lai&mau=1 · #soan&mau=1
+-->
+<style>
+:root{
+  --nen1:#eaf1ff; --nen2:#fff4e6; --chu:#14213d; --nhat:#55637d; --kinh:rgba(255,255,255,.82); --vien:rgba(20,33,61,.10);
+  --chinh:#2457d6; --chinh2:#6d3fe0; --cam:#f97316;
+  --b1:#0e9f9a; --b2:#2563eb; --b3:#7c3aed; --b4:#f97316;   /* 4 bậc thang — cùng màu ở mọi nơi */
+  --dung:#12a150; --sai:#e5484d; --vang:#f5a524; --khoa:#c3cad8;
+  --bo:18px; --bong:0 10px 30px rgba(20,33,61,.10), 0 2px 6px rgba(20,33,61,.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{min-height:100%}
+body{font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;font-size:17px;line-height:1.5;color:var(--chu);
+  background:radial-gradient(900px 500px at 8% -10%,#d7e6ff 0,transparent 60%),radial-gradient(800px 500px at 100% 0,#ffe3c4 0,transparent 55%),linear-gradient(160deg,var(--nen1),var(--nen2));
+  background-attachment:fixed;min-height:100dvh;display:flex;flex-direction:column}
+button{font:inherit;cursor:pointer;border:none}
+input,textarea,select{font:inherit;color:inherit}
+.an{display:none!important}
+/* ---------- đầu trang ---------- */
+header{position:sticky;top:0;z-index:20;display:flex;align-items:center;gap:12px;padding:10px 16px;background:rgba(255,255,255,.72);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid var(--vien)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;color:inherit;min-width:0}
+.logo svg{width:40px;height:40px;flex-shrink:0}
+.ten-app{font-weight:900;font-size:20px;letter-spacing:.3px;background:linear-gradient(90deg,var(--b1),var(--b2) 40%,var(--b3) 70%,var(--b4));-webkit-background-clip:text;background-clip:text;color:transparent;white-space:nowrap}
+.phu{font-size:12px;color:var(--nhat);white-space:nowrap}
+nav{margin-left:auto;display:flex;gap:6px}
+nav a{padding:8px 12px;border-radius:999px;text-decoration:none;color:var(--chu);font-weight:600;font-size:15px;white-space:nowrap}
+nav a.dang{background:var(--chu);color:#fff}
+main{flex:1;width:100%;max-width:1240px;margin:0 auto;padding:18px 16px 24px}
+footer{padding:10px 16px 14px;text-align:center;font-size:13px;color:var(--nhat)}
+footer b{color:var(--dung)}
+.ruy-bang{position:fixed;left:14px;bottom:14px;background:var(--vang);color:#3b2600;font-weight:900;font-size:13px;padding:6px 14px;border-radius:999px;z-index:30;box-shadow:var(--bong)}
+/* ---------- khối chung ---------- */
+.the{background:var(--kinh);border:1px solid rgba(255,255,255,.9);border-radius:var(--bo);box-shadow:var(--bong);padding:18px}
+h1{font-size:30px;line-height:1.2;font-weight:900}
+h2{font-size:21px;line-height:1.3;margin-bottom:8px}
+h3{font-size:17px;margin-bottom:6px}
+.nho{font-size:14px;color:var(--nhat)}
+.nut{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px;padding:10px 20px;border-radius:14px;font-weight:700;color:#fff;background:linear-gradient(135deg,var(--chinh),var(--chinh2));box-shadow:0 6px 16px rgba(36,87,214,.28);transition:transform .15s, box-shadow .15s}
+.nut:hover{transform:translateY(-2px)} .nut:active{transform:translateY(1px) scale(.98)}
+.nut.phu2{background:#fff;color:var(--chu);border:1.5px solid var(--vien);box-shadow:none}
+.nut.xanh{background:linear-gradient(135deg,#16a34a,#0e9f6e);box-shadow:0 6px 16px rgba(18,161,80,.28)}
+.nut.cam{background:linear-gradient(135deg,#fb923c,#f97316)}
+.nut:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:7px 13px;border-radius:999px;background:#fff;border:1.5px solid var(--vien);font-size:15px;margin:3px 4px 3px 0;cursor:pointer}
+.chip.chon{border-color:var(--chinh);background:#eef3ff;font-weight:700}
+.luoi{display:grid;gap:16px}
+.rung{animation:rung .35s}
+@keyframes rung{20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+@keyframes noi{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes hien{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+.hien{animation:hien .3s ease}
+.tat-hieu-ung *{animation:none!important;transition:none!important}
+/* ---------- trang chủ ---------- */
+.hero{display:grid;grid-template-columns:1.15fr .85fr;gap:20px;align-items:center}
+.hero p.lon{font-size:18px;color:var(--nhat);margin:10px 0 16px}
+.ba-y{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:6px}
+.y{background:#fff;border-radius:14px;padding:12px;border:1px solid var(--vien);font-size:14.5px}
+.y b{display:block;font-size:15.5px;margin-bottom:2px}
+.o-ma{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 4px}
+.o-ma input{width:150px;min-height:48px;border-radius:12px;border:1.5px solid var(--vien);padding:8px 12px;font-size:18px;font-weight:700;text-transform:uppercase;background:#fff}
+.tab-lop{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 10px}
+.tab-lop button{padding:9px 18px;border-radius:999px;background:#fff;border:1.5px solid var(--vien);font-weight:700}
+.tab-lop button.dang{background:var(--chu);color:#fff;border-color:var(--chu)}
+.loc-mon{margin:0 0 12px}
+.cua-hoi{display:flex;align-items:center;gap:16px;margin:18px 0 4px;padding:18px 20px;border-radius:20px;text-decoration:none;color:#fff;
+  background:linear-gradient(120deg,#0e9f9a,#2563eb 55%,#7c3aed);box-shadow:0 12px 30px rgba(37,99,235,.30);transition:transform .15s}
+.cua-hoi:hover{transform:translateY(-3px)}
+.cua-hoi b{font-size:22px} .cua-hoi span span{font-size:15px;opacity:.92}
+.cua-hoi-icon{font-size:42px;flex-shrink:0}
+#trangThaiMang{position:fixed;left:50%;top:10px;transform:translateX(-50%);background:#14213d;color:#fff;font-size:14px;font-weight:700;padding:8px 16px;border-radius:999px;z-index:45;box-shadow:var(--bong);display:none;max-width:94vw;text-align:center}
+#trangThaiMang.hien{display:block}
+.the-cai{margin:14px 0 0;padding:14px 18px;border-radius:18px;background:#fff;border:2px dashed var(--chinh);display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.the-cai .icon{font-size:34px}
+.cua-hoi-mui{margin-left:auto;background:#fff;color:#2457d6;font-weight:800;padding:10px 16px;border-radius:999px;white-space:nowrap}
+@media (max-width:560px){.cua-hoi{flex-wrap:wrap;padding:14px}.cua-hoi b{font-size:19px}.cua-hoi-mui{margin-left:0}}
+.ds-bai{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.the-bai{display:flex;gap:12px;align-items:center;text-align:left;background:#fff;border-radius:16px;padding:14px;border:1.5px solid var(--vien);box-shadow:var(--bong);transition:transform .15s}
+.the-bai:hover{transform:translateY(-3px)}
+.the-bai svg{width:64px;height:64px;flex-shrink:0}
+.the-bai .nhan{font-size:12.5px;font-weight:700;color:var(--chinh)}
+.the-bai .td{font-weight:800;font-size:16.5px;line-height:1.3}
+.huy-gv{font-size:12px;color:var(--dung);font-weight:700}
+/* ---------- màn viết ---------- */
+.viet{display:grid;grid-template-columns:360px 1fr;grid-template-areas:"de viet" "thang soi";gap:16px;align-items:start}
+.o-de{grid-area:de} .o-viet{grid-area:viet} .o-thang{grid-area:thang} .o-soi{grid-area:soi}
+.de-bai .nhan{font-size:13px;font-weight:800;color:var(--chinh);text-transform:uppercase;letter-spacing:.5px}
+.de-bai .cau{font-size:19px;font-weight:800;margin:4px 0 8px;line-height:1.35}
+.cu-hang{display:flex;gap:12px;align-items:flex-end}
+.cu{width:92px;height:96px;flex-shrink:0}
+.cu .mat{transition:transform .2s}
+.cu.nghi .dong-tu{transform:translate(2px,-2px)}
+.loi-cu{position:relative;flex:1;background:#fff;border-radius:16px 16px 16px 4px;padding:12px 15px;border:1.5px solid #dbe4f5;box-shadow:var(--bong);font-size:17px;min-height:64px}
+.loi-cu b{color:var(--chinh2)}
+textarea.o-go{width:100%;min-height:210px;resize:vertical;border-radius:16px;border:2px solid #cfdaf0;padding:14px 16px;font-size:18px;line-height:1.6;background:#fff;outline:none;margin-top:12px}
+textarea.o-go:focus{border-color:var(--chinh);box-shadow:0 0 0 4px rgba(36,87,214,.12)}
+.thanh-tu{display:flex;align-items:center;gap:10px;margin:10px 0 2px;font-size:14.5px;color:var(--nhat)}
+.vach{flex:1;height:12px;border-radius:99px;background:#e6ebf5;overflow:hidden;position:relative}
+.vach i{position:absolute;inset:0 auto 0 0;border-radius:99px;background:linear-gradient(90deg,var(--b1),var(--b2),var(--b3));transition:width .3s}
+.vach .moc{position:absolute;top:-2px;bottom:-2px;width:3px;border-radius:2px;background:#fff;opacity:.9}
+.hang-nut{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.thang-svg{width:100%;height:auto;display:block;margin:4px auto 6px;max-width:300px}
+.bac{border-radius:14px;border:1.5px solid var(--vien);background:#fff;margin-top:10px;overflow:hidden}
+.bac-dau{display:flex;align-items:center;gap:10px;padding:11px 13px;width:100%;background:none;text-align:left}
+.bac-dau:disabled{color:inherit;cursor:default}
+.bac-so{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:900;font-size:15px;flex-shrink:0}
+.bac-ten{font-weight:800;flex:1}
+.bac-tt{font-size:13px;font-weight:700;color:var(--nhat);text-align:right}
+.bac.khoa .bac-so{background:var(--khoa)!important}
+.bac.khoa{opacity:.85}
+.bac-than{padding:2px 14px 14px;font-size:15.5px;animation:hien .3s}
+.bac-than ul{padding-left:18px} .bac-than li{margin:3px 0}
+.tu-bang{display:flex;flex-wrap:wrap;gap:6px}
+.tu-bang span{background:#eef3ff;border-radius:10px;padding:4px 10px;font-size:14.5px}
+.khung-cau{font-family:Consolas,"Cascadia Mono",monospace;font-size:14.5px;background:#f5f0ff;border-radius:10px;padding:6px 10px;margin:5px 0}
+.mau-khac{background:#fff7ed;border-left:4px solid var(--b4);border-radius:8px;padding:8px 12px;font-style:italic}
+.canh-bao-mau{font-size:13px;color:#9a3412;margin-top:6px;font-weight:600}
+.chuan{display:flex;flex-direction:column;gap:6px;margin-top:8px}
+.chuan div{display:flex;gap:8px;align-items:center;font-size:15px}
+.chuan .dau{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:13px;color:#fff;flex-shrink:0;background:var(--khoa)}
+.chuan .ok .dau{background:var(--dung)}
+.guong{background:#fff;border-radius:14px;border:1.5px dashed #cfdaf0;padding:12px 14px;font-size:17px;line-height:1.9;white-space:pre-wrap;word-break:break-word}
+.guong mark{background:none;border-bottom:3px solid var(--sai);color:inherit;padding:0 1px;border-radius:2px;background:rgba(229,72,77,.08)}
+.guong mark sup{font-size:11px;font-weight:800;color:var(--sai);margin-left:2px}
+.ds-loi{display:grid;gap:8px;margin-top:10px}
+.loi{display:flex;gap:10px;align-items:flex-start;background:#fff;border-radius:12px;padding:10px 12px;border-left:4px solid var(--sai)}
+.loi .so{width:24px;height:24px;border-radius:50%;background:var(--sai);color:#fff;display:grid;place-items:center;font-size:13px;font-weight:800;flex-shrink:0}
+.loi b{display:block}
+.khong-loi{background:#ecfdf3;border-left-color:var(--dung)}
+/* ---------- kết quả ---------- */
+.ket{display:grid;grid-template-columns:330px 1fr;gap:18px;align-items:start}
+.huy-chuong{text-align:center}
+.huy-chuong svg{width:240px;height:240px}
+.o-so{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.o-so div{background:#fff;border-radius:14px;padding:12px;border:1px solid var(--vien)}
+.o-so b{display:block;font-size:26px;line-height:1.1}
+.o-so span{font-size:13.5px;color:var(--nhat)}
+.cam-xuc{display:flex;gap:10px;flex-wrap:wrap;margin:8px 0}
+.cam-xuc button{font-size:15px;padding:10px 14px;border-radius:14px;background:#fff;border:2px solid var(--vien);font-weight:700}
+.cam-xuc button.chon{border-color:var(--chinh);background:#eef3ff}
+.ma-nop{font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px;word-break:break-all;background:#0f1b33;color:#cfe0ff;border-radius:12px;padding:10px 12px;max-height:110px;overflow:auto}
+.phao{position:fixed;inset:0;pointer-events:none;z-index:50;overflow:hidden}
+.phao i{position:absolute;top:-20px;width:10px;height:14px;border-radius:2px;animation:roi 1.6s linear forwards}
+@keyframes roi{to{transform:translateY(105vh) rotate(720deg);opacity:.7}}
+/* ---------- bàn giáo viên ---------- */
+.kpi{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}
+.kpi div{background:#fff;border-radius:16px;padding:14px;border:1px solid var(--vien);box-shadow:var(--bong)}
+.kpi b{display:block;font-size:30px;line-height:1.1;font-weight:900}
+.kpi span{font-size:13.5px;color:var(--nhat)}
+.bieu{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:16px;margin-top:16px}
+.bieu svg{width:100%;height:auto;display:block}
+table{width:100%;border-collapse:collapse;font-size:14.5px;background:#fff;border-radius:14px;overflow:hidden}
+th,td{padding:8px 10px;text-align:left;border-bottom:1px solid #edf1f7}
+th{background:#f3f6fc;font-size:13px;color:var(--nhat)}
+.cham{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:2px;vertical-align:middle}
+.bang-cuon{overflow-x:auto;border-radius:14px;box-shadow:var(--bong);margin-top:16px}
+textarea.dan{width:100%;min-height:90px;border-radius:12px;border:1.5px solid var(--vien);padding:10px;font-family:Consolas,monospace;font-size:13px;background:#fff}
+.chu-thich{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--nhat);margin-top:6px}
+.hoi{display:grid;grid-template-columns:400px 1fr;gap:16px;align-items:start}
+.da{margin-top:8px;background:#f0fdf4;border:1.5px solid #a7e8c1;border-radius:10px;padding:8px 10px;font-size:15px}
+.da .sai{text-decoration:line-through;color:var(--sai)} .da .dung{color:var(--dung);font-weight:800}
+.nut.nho2{min-height:36px;padding:4px 12px;font-size:14px;margin-top:6px}
+.nhay{animation:nhay 1.2s ease-in-out infinite} @keyframes nhay{0%,100%{box-shadow:0 0 0 0 rgba(249,115,22,.5)}50%{box-shadow:0 0 0 10px rgba(249,115,22,0)}}
+.hop-hoi{display:grid;gap:10px;margin-top:10px}
+.hop-hoi .o{background:#fff;border-radius:12px;border:1.5px solid var(--vien);padding:10px 12px}
+.hop-hoi .o.co-van-de{border-color:var(--sai);background:#fff5f5}
+.hop-hoi textarea{width:100%;min-height:60px;border-radius:10px;border:1.5px solid var(--vien);padding:8px;font:inherit;font-size:15px;margin-top:6px}
+.chi-soi .viet{grid-template-columns:1fr;grid-template-areas:"soi"} .chi-soi .o-de,.chi-soi .o-viet,.chi-soi .o-thang{display:none}
+/* ---------- phát lại ---------- */
+.man-che{position:fixed;inset:0;background:rgba(15,27,51,.55);z-index:40;display:grid;place-items:center;padding:16px}
+.hop{width:min(860px,100%);max-height:92dvh;overflow:auto;background:#fff;border-radius:20px;padding:20px;box-shadow:0 30px 80px rgba(0,0,0,.3)}
+.truc{position:relative;height:34px;margin:10px 0 4px}
+.truc input{width:100%}
+.su-kien{position:relative;height:18px}
+.su-kien i{position:absolute;top:0;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.3)}
+.van-ban-pl{min-height:150px;font-size:18px;line-height:1.8;white-space:pre-wrap;background:#f8faff;border-radius:14px;padding:14px;border:1.5px solid #e2e8f4}
+.van-ban-pl ins{text-decoration:none;background:#d9f7e6;border-radius:3px}
+/* ---------- soạn thang ---------- */
+.soan{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.soan label{display:block;font-weight:700;font-size:14.5px;margin:10px 0 4px}
+.soan input,.soan textarea,.soan select{width:100%;border-radius:12px;border:1.5px solid var(--vien);padding:9px 12px;background:#fff;font-size:15.5px}
+.soan textarea{min-height:70px}
+.cot-chuan label{display:flex;gap:8px;align-items:center;font-weight:500;margin:4px 0}
+.cot-chuan input{width:auto}
+.lenh{font-family:Consolas,monospace;font-size:12.5px;white-space:pre-wrap;background:#0f1b33;color:#d6e4ff;border-radius:12px;padding:12px;max-height:240px;overflow:auto}
+.duyet{display:flex;gap:10px;align-items:center;background:#ecfdf3;border:1.5px solid #a7e8c1;border-radius:12px;padding:10px 12px;margin-top:12px;font-weight:700}
+.duyet input{width:22px;height:22px}
+/* ---------- điện thoại ---------- */
+@media (max-width:900px){
+  .hero,.ket,.soan,.hoi{grid-template-columns:1fr}
+  .viet{grid-template-columns:1fr;grid-template-areas:"de" "viet" "soi" "thang"}
+  .kpi{grid-template-columns:repeat(3,1fr)} .bieu{grid-template-columns:1fr}
+  .ba-y{grid-template-columns:1fr}
+  .hero-hinh{order:-1;max-width:340px;margin:0 auto}
+}
+@media (max-width:560px){
+  body{font-size:16.5px}
+  header{padding:8px 12px;gap:8px} .logo>span{display:none}
+  nav a{padding:6px 7px;font-size:12.5px} nav{gap:2px}
+  main{padding:12px 12px 20px}
+  h1{font-size:25px}
+  .the{padding:14px}
+  .kpi{grid-template-columns:repeat(2,1fr)} .kpi b{font-size:24px}
+  .cu{width:70px;height:74px}
+  textarea.o-go{font-size:17px;min-height:190px}
+  .hang-nut .nut{flex:1}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="gCu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8b5cf6"/><stop offset="1" stop-color="#5b3cc4"/></linearGradient>
+    <linearGradient id="gBung" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fde9c9"/><stop offset="1" stop-color="#f8cf8c"/></linearGradient>
+    <linearGradient id="gThang" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#c7a27a"/><stop offset="1" stop-color="#8b6542"/></linearGradient>
+    <linearGradient id="gVang" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde68a"/><stop offset="1" stop-color="#f59e0b"/></linearGradient>
+    <linearGradient id="gTroi" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="1" stop-color="#fef3c7"/></linearGradient>
+    <symbol id="cu" viewBox="0 0 100 104">
+      <ellipse cx="50" cy="99" rx="28" ry="4" fill="rgba(0,0,0,.12)"/>
+      <path d="M18 52c0-22 14-36 32-36s32 14 32 36c0 26-14 44-32 44S18 78 18 52z" fill="url(#gCu)"/>
+      <path d="M30 62c0-12 9-20 20-20s20 8 20 20c0 15-9 26-20 26s-20-11-20-26z" fill="url(#gBung)"/>
+      <path d="M36 68q14 6 28 0M38 76q12 5 24 0" stroke="#e7b36a" stroke-width="2" fill="none" stroke-linecap="round"/>
+      <g class="mat"><circle cx="38" cy="42" r="12" fill="#fff"/><circle cx="62" cy="42" r="12" fill="#fff"/>
+      <g class="dong-tu"><circle cx="39" cy="43" r="5.5" fill="#1e1b4b"/><circle cx="61" cy="43" r="5.5" fill="#1e1b4b"/><circle cx="41" cy="41" r="1.8" fill="#fff"/><circle cx="63" cy="41" r="1.8" fill="#fff"/></g></g>
+      <path d="M46 52l4 7 4-7z" fill="#f59e0b"/>
+      <path d="M20 22l30-12 30 12-30 12z" fill="#1e293b"/><path d="M34 27v9q16 7 32 0v-9" fill="#334155"/>
+      <path d="M80 22v14" stroke="#f59e0b" stroke-width="2.5"/><circle cx="80" cy="38" r="3.5" fill="#f59e0b"/>
+      <path d="M18 60q-8 6-6 18 8-4 10-12z" fill="#5b3cc4"/><path d="M82 60q8 6 6 18-8-4-10-12z" fill="#5b3cc4"/>
+    </symbol>
+  </defs>
+</svg>
+<header>
+  <a class="logo" href="#trang-chu" aria-label="Trang chủ">
+    <svg viewBox="0 0 40 40"><rect width="40" height="40" rx="11" fill="#14213d"/><path d="M12 33V7M28 33V7" stroke="#c7a27a" stroke-width="3" stroke-linecap="round"/><path d="M12 28h16" stroke="#0e9f9a" stroke-width="3.2"/><path d="M12 21h16" stroke="#2563eb" stroke-width="3.2"/><path d="M12 14h16" stroke="#7c3aed" stroke-width="3.2"/><circle cx="20" cy="8" r="3.4" fill="#f97316"/></svg>
+    <span><span class="ten-app">THANG GỢI MỞ</span><br><span class="phu">Socratic Mind Mentor 3.0 · AI không làm hộ — AI chỉ đường</span></span>
+  </a>
+  <nav>
+    <a href="#trang-chu" data-man="trang-chu">🧗 Luyện viết</a>
+    <a href="#hoi" data-man="hoi">🧭 Hỏi gia sư</a>
+    <a href="#gv" data-man="gv">📊 Bàn GV</a>
+    <a href="#soan" data-man="soan">✍️ Soạn</a>
+  </nav>
+</header>
+<main id="man"></main>
+<footer><b>✅ BẢN NHÁP — thầy/cô duyệt trước khi dùng</b> · Không đăng nhập · Học sinh không chat tự do với AI · Cài lên màn hình chính: mất mạng vẫn luyện, có mạng bấm gửi cô · Chỉ dùng mã lớp–số thứ tự, không ghi họ tên</footer>
+<div id="phao" class="phao"></div>
+<div id="che"></div>
+
+<script>
+"use strict";
+/* =====================================================================
+   1. DỮ LIỆU: THƯ VIỆN CẤU TRÚC · LỖI · ĐỀ VIẾT (Global Success 6–9)
+   Nội dung do AI soạn nháp, giáo viên soát — ✅ BẢN NHÁP, thầy/cô đối chiếu SGK.
+   ===================================================================== */
+const CAU_TRUC = {
+  vthich:{nhan:"Động từ chỉ sở thích + V-ing (like, love, enjoy…)", re:/\b(?:like|likes|love|loves|enjoy|enjoys|hate|hates|adore|adores|fancy|fancies|prefer|prefers|detest|detests|mind|minds)\s+[a-z]+ing\b/gi},
+  thereis:{nhan:"There is / There are", re:/\bthere\s+(?:is|are)\b/gi},
+  tanSuat:{nhan:"Trạng từ tần suất (always, usually, often, sometimes…)", re:/\b(?:always|usually|often|sometimes|never|rarely)\b/gi},
+  soSanh:{nhan:"So sánh hơn (… -er than / more … than)", re:/\b(?:[a-z]+er|more\s+[a-z]+|less\s+[a-z]+)\s+than\b/gi},
+  tuNoi:{nhan:"Từ nối (first, also, besides, however, finally…)", re:/\b(?:first|firstly|also|besides|however|finally|moreover|in addition)\b/gi},
+  lyDo:{nhan:"Nêu lí do (because / so)", re:/\b(?:because|so)\b/gi},
+  cumDT:{nhan:"Cụm động từ (set up, carry on, pass down…)", re:/\b(?:set|sets|setting)\s+up\b|\b(?:carry|carries|carried)\s+on\b|\b(?:take|takes|took)\s+care\s+of\b|\b(?:look|looks)\s+(?:after|around)\b|\b(?:pass|passed|hand|handed)\s+down\b|\b(?:find|found)\s+out\b|\b(?:come|came)\s+back\b|\b(?:close|closed)\s+down\b|\b(?:get|gets)\s+on\s+with\b/gi},
+  hoiToV:{nhan:"Từ để hỏi + to V (how to make, what to do…)", re:/\b(?:how|what|where|when|which|who)\s+to\s+[a-z]+/gi},
+  hienTai:{nhan:"Hiện tại đơn với I / we (I have, we study…)", re:/\b(?:i|we|they)\s+(?:have|study|learn|go|like|love|play|wear|live|walk|ride|eat)\b/gi},
+  quaKhu:{nhan:"Quá khứ đơn (was, were, …ed)", re:/\b(?:was|were|started|visited|learned|learnt|went|made)\b/gi},
+  tuongLai:{nhan:"Tương lai (will / be going to)", re:/\b(?:will|going\s+to)\b/gi},
+  /* bài viết tiếng Việt (Ngữ văn, HĐTN, Lịch sử và Địa lí, KHTN…) */
+  viYKien:{vi:1, nhan:"Nêu rõ ý kiến (theo em, em cho rằng…)", re:/(?:theo em|em cho rằng|em nghĩ|ý kiến của em|em đồng ý|em không đồng ý|theo tôi|tôi cho rằng)/gi},
+  viDanChung:{vi:1, nhan:"Có dẫn chứng (ví dụ, chẳng hạn, thực tế…)", re:/(?:ví dụ|chẳng hạn|thực tế|như là|bằng chứng)/gi},
+  viNoi:{vi:1, nhan:"Từ nối (trước hết, bên cạnh đó, tuy nhiên, vì vậy, tóm lại…)", re:/(?:trước hết|thứ nhất|thứ hai|bên cạnh đó|ngoài ra|tuy nhiên|vì vậy|do đó|tóm lại|nhìn chung|cuối cùng)/gi},
+  viLyDo:{vi:1, nhan:"Giải thích nguyên nhân (vì, bởi vì, do…)", re:/(?:bởi vì|vì|do|nguyên nhân)/gi},
+  viKetQua:{vi:1, nhan:"Nêu kết quả / hệ quả (nên, vì thế, dẫn đến…)", re:/(?:nên|vì thế|vì vậy|dẫn đến|kết quả là|nhờ đó)/gi}
+};
+
+/* Lỗi hay gặp của HS Việt Nam khi viết tiếng Anh. Mỗi lỗi: tên gọi + MỘT câu hỏi gợi mở (không đưa đáp án). */
+const TRUOC = (chu, i, re) => re.test(chu.slice(Math.max(0, i - 14), i));
+const LOI = [
+  {id:"vn", ten:"Còn chữ tiếng Việt", re:/[A-Za-z]*[àáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ][A-Za-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]*/gi,
+   hoi:"Em đang viết tiếng Việt ở chỗ gạch đỏ. Từ nào chưa biết, em mở Bậc 2 — Từ ngữ, rồi tự chọn từ hợp nhất nhé?"},
+  {id:"be", ten:"Thừa “am / is / are” trước động từ", re:/\b(?:am|is|are)\s+(?:love|enjoy|go|play|agree|have|want|watch|read|live|study|help|visit|need|like)\b/gi,
+   bo:(c,i,m)=>/^(?:is|are)\s+like$/i.test(m),
+   hoi:"Câu này đã có động từ chính rồi. Em thử đọc lại: còn cần “am / is / are” đứng trước nó nữa không?"},
+  {id:"s3", ten:"Quên “-s / -es” với ngôi thứ ba số ít", re:/\b(?:he|she|it|my\s+(?:mother|father|mum|dad|brother|sister|friend|teacher|school|village|grandfather|grandmother|aunt|uncle|family))\s+(?:like|go|play|watch|have|do|live|want|read|love|enjoy|work|study|help|visit|need|get|make|grow|teach)\b/gi,
+   bo:(c,i)=>TRUOC(c,i,/(?:does|did|do|can|will|would|could|should|must|may|might|n't|to|let|help|make|makes|made)\s+$/i),
+   hoi:"Chủ ngữ ở chỗ gạch đỏ là MỘT người / một vật (ngôi thứ ba số ít). Động từ hiện tại đơn đi sau nó cần thêm gì?"},
+  {id:"lb", ten:"Sau động từ chỉ sở thích chưa dùng V-ing / to V", re:/\b(?:like|likes|love|loves|enjoy|enjoys|hate|hates|prefer|prefers|adore|adores|fancy|fancies|detest|detests)\s+(?:play|read|watch|go|listen|cook|swim|ride|draw|collect|do|make|grow|help|sing|dance|surf|hang|visit|walk|study|learn|fish|garden)\b/gi,
+   hoi:"Sau like / love / enjoy… em đang để động từ nguyên mẫu. Em nhớ lại xem: hoạt động đứng sau các động từ chỉ sở thích có dạng nào?"},
+  {id:"et", ten:"“enjoy / adore / fancy / mind” + to V", re:/\b(?:enjoy|enjoys|enjoyed|adore|adores|fancy|fancies|detest|detests|mind|minds)\s+to\s+[a-z]+/gi,
+   hoi:"Có những động từ chỉ đi với V-ing, không đi với “to V”. “enjoy” có thuộc nhóm đó không? Em thử đổi lại xem."},
+  {id:"vl", ten:"“very like” — đặt sai chỗ “rất”", re:/\bvery\s+(?:like|likes|love|loves|enjoy|enjoys)\b/gi,
+   hoi:"Trong tiếng Anh, “very” thường đi với tính từ. Muốn nói “rất thích”, em sẽ đặt “very much” ở đâu trong câu?"},
+  {id:"th", ten:"Dịch từng chữ “có” → “there have”", re:/\bthere\s+(?:have|has)\b/gi,
+   hoi:"“There have / has” là đang dịch từng chữ “có” của tiếng Việt. Tiếng Anh dùng cụm nào để nói “có cái gì ở đâu”?"},
+  {id:"mb", ten:"Thiếu “to be” trước tính từ", re:/\b(?:i|he|she|we|they|it)\s+(?:very\s+|so\s+|really\s+)?(?:happy|sad|tired|interested|excited|busy|bored|beautiful|friendly|good|kind|tall|old|young|hungry|famous|proud)\b/gi,
+   bo:(c,i)=>TRUOC(c,i,/(?:make|makes|made|keep|keeps|kept|find|finds|found|think|feel|feels|let)\s+$/i),
+   hoi:"Ở chỗ gạch đỏ, câu chưa có động từ. Với tính từ (happy, tired, famous…), em cần thêm từ nào sau chủ ngữ?"},
+  {id:"pp", ten:"“people” là số nhiều", re:/\bpeople\s+(?:is|was|has|likes|lives|works)\b/gi,
+   hoi:"“People” là một người hay nhiều người? Vậy động từ đi sau nó nên ở dạng nào?"},
+  {id:"dc", ten:"So sánh hai lần (more + -er)", re:/\bmore\s+(?:bigger|better|faster|quieter|cleaner|cheaper|busier|easier|happier|smaller|larger|older|younger|taller|longer|nicer|safer|harder|slower|higher|greener|fresher|noisier)\b/gi,
+   hoi:"“more” và đuôi “-er” đều là dấu hiệu so sánh hơn. Dùng cả hai cùng lúc thì có thừa không? Em giữ cái nào?"},
+  {id:"li", ten:"Chữ “i” (tôi) chưa viết hoa", re:/(^|[\s,.!?;:"(])i(?=[\s',.!?;:")]|$)/g, nhom:1,
+   hoi:"Trong tiếng Anh, từ “I” (tôi) viết thế nào ở mọi vị trí trong câu? Em soát các chỗ gạch đỏ nhé."},
+  {id:"sc", ten:"Đầu câu chưa viết hoa", re:/([.!?]\s+)([a-z])/g, nhom:1,
+   hoi:"Sau dấu chấm là một câu mới. Chữ cái đầu câu mới của em đã đúng chưa?"},
+  {id:"ne", ten:"Thiếu dấu kết câu", re:null,
+   hoi:"Câu cuối của em đã kết thúc bằng dấu chấm (hoặc ! ?) chưa?"}
+];
+/* Bài viết tiếng Việt (mọi môn): lỗi trình bày chung — không chấm ý, ý do giáo viên đánh giá */
+const THUONG_VI = "a-zàáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ";
+const LOI_VI = [
+  {id:"tn", ten:"Viết tắt kiểu tin nhắn", re:/(^|[\s,.!?;:(])(?:ko|k|kh|hok|dc|đc|j|vs|ntn|mn|bn|cx|nx|trc|ng|r|z)(?=[\s,.!?;:)]|$)/gi, nhom:1,
+   hoi:"Chỗ gạch đỏ là cách viết tắt khi nhắn tin. Trong bài viết ở trường, em sẽ viết đầy đủ từ đó thế nào?"},
+  {id:"hv", ten:"Đầu câu chưa viết hoa", re:new RegExp("([.!?…]\\s+)([" + THUONG_VI + "])", "g"), nhom:1,
+   hoi:"Sau dấu chấm là một câu mới. Chữ cái đầu câu mới của em đã viết đúng chưa?"},
+  {id:"kd", ten:"Viết chưa có dấu thanh", re:null,
+   hoi:"Nhiều chữ trong bài chưa có dấu. Em đọc lại xem người đọc có thể hiểu nhầm nghĩa ở chỗ nào không?"},
+  {id:"cd", ten:"Câu quá dài (trên 45 chữ)", re:null,
+   hoi:"Câu gạch đỏ rất dài. Em có thể tách nó thành hai câu ở chỗ nào để người đọc dễ theo dõi hơn?"},
+  {id:"lt", ten:"Lặp từ", re:null,
+   hoi:"Cụm từ gạch đỏ lặp lại nhiều lần. Em có muốn thay một lần bằng từ đồng nghĩa hoặc đại từ không?"}
+];
+const TEN_LOI = Object.fromEntries(LOI.concat(LOI_VI).map(l => [l.id, l.ten]));
+const MON = {anh:"Tiếng Anh", van:"Ngữ văn", hdtn:"HĐTN – Hướng nghiệp", lsdl:"Lịch sử và Địa lí", khtn:"KHTN", gdcd:"GDCD", tin:"Tin học", khac:"Môn khác"};
+const laAnh = b => (b.mon || "anh") === "anh";
+const dv = b => laAnh(b) ? "từ" : "chữ";
+const boLoi = b => laAnh(b) ? LOI : LOI_VI.concat([LOI.find(l => l.id === "ne")]);
+
+/* Ảnh minh hoạ đề (SVG tự vẽ) */
+const HINH = {
+  truong:`<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#e0ecff"/><path d="M10 50V28l22-12 22 12v22z" fill="#fff" stroke="#2563eb" stroke-width="2.5"/><rect x="27" y="36" width="10" height="14" rx="2" fill="#2563eb"/><rect x="15" y="32" width="8" height="7" rx="1.5" fill="#93c5fd"/><rect x="41" y="32" width="8" height="7" rx="1.5" fill="#93c5fd"/><path d="M32 8v8" stroke="#e5484d" stroke-width="2"/><path d="M32 8h9l-2 3 2 3h-9" fill="#e5484d"/><path d="M6 52h52" stroke="#16a34a" stroke-width="3" stroke-linecap="round"/></svg>`,
+  sothich:`<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#f3e8ff"/><circle cx="24" cy="30" r="14" fill="#fff" stroke="#7c3aed" stroke-width="2.5"/><circle cx="19" cy="25" r="3" fill="#f97316"/><circle cx="28" cy="23" r="3" fill="#2563eb"/><circle cx="30" cy="32" r="3" fill="#16a34a"/><circle cx="20" cy="35" r="3.4" fill="#fff" stroke="#7c3aed" stroke-width="2"/><path d="M38 46l14-22" stroke="#8b6542" stroke-width="4" stroke-linecap="round"/><path d="M52 24l3-5-5 2z" fill="#14213d"/><circle cx="44" cy="50" r="6" fill="#fff" stroke="#14213d" stroke-width="2"/><path d="M41 47l6 6M47 47l-6 6" stroke="#14213d" stroke-width="1.5"/></svg>`,
+  ranh:`<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#ffedd5"/><circle cx="46" cy="18" r="7" fill="#fbbf24"/><path d="M8 46q12-8 24 0t24 0v10H8z" fill="#38bdf8"/><rect x="14" y="22" width="20" height="14" rx="3" fill="#fff" stroke="#f97316" stroke-width="2.5"/><path d="M20 26l7 3-7 3z" fill="#f97316"/><circle cx="44" cy="38" r="5" fill="#fff" stroke="#14213d" stroke-width="2"/><path d="M44 33v10M39 38h10" stroke="#14213d" stroke-width="1.2"/></svg>`,
+  dongque:`<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#dcfce7"/><circle cx="48" cy="16" r="7" fill="#fbbf24"/><path d="M4 38q14-10 28-2t28-4v28H4z" fill="#86efac"/><path d="M4 46q14-6 28 0t28 0v14H4z" fill="#22c55e"/><path d="M14 46v-8M18 46v-10M22 46v-7M40 48v-9M44 48v-11M48 48v-8" stroke="#166534" stroke-width="2" stroke-linecap="round"/><path d="M26 30l6-8 6 8z" fill="#a16207"/><rect x="27" y="30" width="10" height="7" fill="#fef3c7"/></svg>`,
+  ngheco:`<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#fef9c3"/><path d="M12 40h40l-5 14H17z" fill="#d6a85a" stroke="#8b6542" stroke-width="2"/><path d="M14 44h36M16 48h32M18 52h28" stroke="#8b6542" stroke-width="1.4"/><path d="M22 40c-2-10 2-20 6-26M32 40c0-12 1-20 2-28M42 40c2-10-1-18-4-24" stroke="#65a30d" stroke-width="2.5" fill="none" stroke-linecap="round"/></svg>`,
+  nghiluan:`<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#fee2e2"/><path d="M10 14h30a6 6 0 0 1 6 6v12a6 6 0 0 1-6 6H24l-8 7v-7h-6a6 6 0 0 1-6-6V20a6 6 0 0 1 6-6z" fill="#fff" stroke="#e5484d" stroke-width="2.5"/><path d="M12 22h24M12 28h18" stroke="#e5484d" stroke-width="2.5" stroke-linecap="round"/><path d="M40 52h18M49 34v18M42 38h14" stroke="#14213d" stroke-width="2.4" stroke-linecap="round"/><path d="M42 38l-3 7h6zM56 38l-3 7h6z" fill="#fbbf24" stroke="#14213d" stroke-width="1.5"/></svg>`,
+  rieng:`<svg viewBox="0 0 64 64"><rect width="64" height="64" rx="16" fill="#e0f2fe"/><path d="M18 50V14M46 50V14" stroke="#8b6542" stroke-width="4" stroke-linecap="round"/><path d="M18 42h28" stroke="#0e9f9a" stroke-width="4"/><path d="M18 32h28" stroke="#2563eb" stroke-width="4"/><path d="M18 22h28" stroke="#7c3aed" stroke-width="4"/><circle cx="32" cy="12" r="5" fill="#f97316"/></svg>`
+};
+
+const BAI_GOC = [
+ {id:"g6u1", lop:6, unit:"Unit 1 · My New School", hinh:"truong",
+  de:"Write 5–7 sentences about your school.", deVi:"Viết 5–7 câu giới thiệu ngôi trường của em.",
+  tu:[40,60], mo:[0,8,20,30], ct:[["thereis",1],["hienTai",2],["lyDo",1]],
+  cauHoi:"Nếu một bạn nước ngoài đến thăm trường em, em sẽ dẫn bạn ấy xem chỗ nào đầu tiên? Vì sao?",
+  chon:["the school garden","the library","my classroom","the playground","the computer room"],
+  tuNgu:["classroom – lớp học","library – thư viện","playground – sân chơi","school garden – vườn trường","computer room – phòng máy tính","uniform – đồng phục","subject – môn học","friendly – thân thiện","large – rộng","quiet – yên tĩnh","modern – hiện đại","favourite – yêu thích nhất"],
+  khung:["My school is in …","There are … classrooms in my school.","I have … lessons on …","My favourite subject is … because …","I like my school because …"],
+  mau:"My grandparents' house is in the countryside. There is a big garden in front of it. There are many fruit trees and flowers. I visit it every Sunday. I love it because it is quiet and green."},
+ {id:"g7u1", lop:7, unit:"Unit 1 · Hobbies", hinh:"sothich",
+  de:"Write 6–8 sentences (60–80 words) about your hobby.", deVi:"Viết 6–8 câu (60–80 từ) về sở thích của em.",
+  tu:[60,80], mo:[0,10,25,40], ct:[["vthich",2],["tanSuat",1],["lyDo",1]],
+  cauHoi:"Sở thích của em là gì, và em bắt đầu thích nó từ khi nào? Hãy chọn một sở thích em có thể kể chuyện thật về nó.",
+  chon:["drawing","playing football","gardening","collecting stamps","cooking","making models"],
+  tuNgu:["collect – sưu tầm","gardening – làm vườn","making models – làm mô hình","arrange flowers – cắm hoa","horse riding – cưỡi ngựa","creative – sáng tạo","relaxing – thư giãn","patient – kiên nhẫn","in my free time – lúc rảnh","at weekends – vào cuối tuần","share … with … – chia sẻ … với …","useful – có ích"],
+  khung:["My hobby is …","I started … when I was … years old.","I usually … in my free time.","I enjoy … because it is …","In the future, I want to …"],
+  mau:"My brother's hobby is fishing. He started it when he was eight. He often goes fishing with our uncle at weekends. He enjoys sitting by the river because it is quiet and relaxing. He says fishing teaches him to be patient."},
+ {id:"g8u1", lop:8, unit:"Unit 1 · Leisure Time", hinh:"ranh",
+  de:"Write a paragraph (80–100 words) about how you spend your leisure time.", deVi:"Viết đoạn văn (80–100 từ) kể em dành thời gian rảnh như thế nào.",
+  tu:[80,100], mo:[0,15,35,55], ct:[["vthich",2],["tanSuat",1],["tuNoi",2]],
+  cauHoi:"Khi rảnh, em thích ở trong nhà hay ra ngoài hơn? Em thường làm hoạt động đó với ai?",
+  chon:["hanging out with friends","doing DIY","playing sports","surfing the net","helping my parents","reading books"],
+  tuNgu:["leisure time – thời gian rảnh","hang out with – đi chơi với","do DIY – tự làm đồ","surf the net – lướt mạng","keep fit – giữ dáng","relax – thư giãn","adore – rất thích","fancy – thích","detest – rất ghét","don't mind – không ngại","addicted to – nghiện","socialise – giao lưu"],
+  khung:["In my leisure time, I usually …","I adore / fancy … because …","I also like … with …","However, I don't like … because …","Leisure activities help me …"],
+  mau:"My grandfather is retired, so he has a lot of leisure time. In the morning, he enjoys doing exercise in the park. He also loves growing vegetables in his small garden. In the afternoon, he fancies playing chess with his neighbours. However, he does not like watching TV for too long because it hurts his eyes."},
+ {id:"g8u2", lop:8, unit:"Unit 2 · Life in the Countryside", hinh:"dongque",
+  de:"Write a paragraph (80–100 words) about life in your village.", deVi:"Viết đoạn văn (80–100 từ) về cuộc sống ở làng quê em.",
+  tu:[80,100], mo:[0,15,35,55], ct:[["soSanh",1],["tanSuat",1],["tuNoi",2]],
+  cauHoi:"Nơi em sống có điều gì khiến em thích nhất? Người dân ở đó thường làm gì mỗi ngày?",
+  chon:["paddy fields","fresh air","friendly people","harvest time","weaving sedge mats","flying kites"],
+  tuNgu:["paddy field – ruộng lúa","harvest – mùa gặt","buffalo – con trâu","sedge – cây cói","weave – đan, dệt","peaceful – yên bình","fresh air – không khí trong lành","vast – rộng lớn","friendly – thân thiện","pick fruit – hái quả","more slowly than – chậm hơn","harder than – vất vả hơn"],
+  khung:["I live in a village in …","People here usually …","Life in the countryside is … than life in the city.","I like … because …","However, …"],
+  mau:"My aunt lives in a small fishing village by the sea. People there get up very early and go fishing. Children often help their parents dry fish on the beach. Life there is quieter than life in the city, but people work harder. I love the fresh air and the friendly people there."},
+ {id:"g9u1", lop:9, unit:"Unit 1 · Local Community", hinh:"ngheco",
+  de:"Write a paragraph (100–120 words) about a traditional craft or a place of interest in your community.", deVi:"Viết đoạn văn (100–120 từ) về một nghề truyền thống hoặc địa điểm nổi tiếng ở quê em.",
+  tu:[100,120], mo:[0,20,45,70], ct:[["cumDT",1],["hoiToV",1],["tuNoi",2]],
+  cauHoi:"Quê em có nghề truyền thống hay địa điểm nào khiến em tự hào? Nếu dẫn khách tham quan, em giới thiệu điều gì đầu tiên?",
+  chon:["sedge products","a cathedral","a local market","a craft village","a temple"],
+  tuNgu:["craft – nghề thủ công","artisan – nghệ nhân","sedge – cây cói","weave – đan, dệt","handmade – làm bằng tay","souvenir – quà lưu niệm","attraction – điểm tham quan","pass down – truyền lại","set up – thành lập","carry on – tiếp tục","take care of – chăm sóc","how to make – cách làm"],
+  khung:["One of the most famous … in my community is …","It has a long history. It was set up …","Local people …","Visitors can learn how to …","I hope young people will carry on …"],
+  mau:"Bat Trang is a famous pottery village. It has a very long history. The artisans there know how to make beautiful bowls, vases and plates by hand. Their skills are passed down from parents to children. Visitors can look around the workshops and try making a pot. I hope young people will carry on this craft."},
+ {id:"v9nl", mon:"van", lop:9, unit:"Viết · Nghị luận về một vấn đề đời sống", hinh:"nghiluan",
+  de:"Viết đoạn văn (150–200 chữ) trình bày ý kiến của em về việc học sinh dùng AI để làm bài tập.", deVi:"Đề mẫu — giáo viên Ngữ văn đối chiếu SGK và duyệt trước khi giao.",
+  tu:[150,200], mo:[0,30,70,110], ct:[["viYKien",1],["viDanChung",1],["viNoi",2]],
+  cauHoi:"Lần gần nhất em (hoặc bạn em) dùng AI cho bài tập là khi nào? Lúc đó AI giúp em hiểu bài hơn hay làm bài thay em?",
+  chon:["AI giúp hiểu bài nhanh hơn","AI làm mình lười suy nghĩ","Dùng AI cần có giới hạn","Thầy cô nên hướng dẫn cách dùng AI"],
+  tuNgu:["ỷ lại – dựa dẫm, không tự cố gắng","tư duy độc lập – tự suy nghĩ, không phụ thuộc","công cụ hỗ trợ – giúp ta làm tốt hơn, không làm thay","lạm dụng – dùng quá mức cần thiết","trung thực trong học tập","chủ động – tự làm trước, hỏi sau","hệ quả – kết quả kéo theo","giải pháp – cách khắc phục","có trách nhiệm","lợi ích","tác hại","bản lĩnh"],
+  khung:["Hiện nay, nhiều học sinh …","Theo em, việc dùng AI để làm bài tập …","Trước hết, …","Tuy nhiên, …","Vì vậy, mỗi học sinh cần …"],
+  mau:"Hiện nay, nhiều bạn học sinh dùng điện thoại trong giờ ra chơi. Theo em, việc này có cả mặt lợi và mặt hại. Trước hết, điện thoại giúp các bạn thư giãn sau giờ học căng thẳng. Tuy nhiên, nếu cúi đầu vào màn hình suốt giờ ra chơi, các bạn sẽ ít vận động và ít trò chuyện với nhau. Ví dụ, có những sân trường giờ ra chơi im lặng lạ thường. Vì vậy, mỗi bạn nên tự đặt giới hạn thời gian dùng điện thoại."},
+ {id:"hn9", mon:"hdtn", lop:9, unit:"Nghề truyền thống ở địa phương", hinh:"ngheco",
+  de:"Viết đoạn văn (120–160 chữ) giới thiệu một nghề truyền thống ở quê em và những phẩm chất người làm nghề cần có.", deVi:"Đề mẫu — thầy/cô đối chiếu chủ đề hướng nghiệp trong SGK HĐTN 9 trước khi giao.",
+  tu:[120,160], mo:[0,25,55,85], ct:[["tk:nghề",2],["tk:phẩm chất",1],["viNoi",1]],
+  cauHoi:"Ở quê em có nghề nào được truyền qua nhiều đời? Em đã từng tận mắt thấy người làm nghề đó làm việc chưa — điều gì khiến em nhớ nhất?",
+  chon:["nghề dệt chiếu, làm đồ cói","nghề làm muối","nghề trồng lúa","nghề mộc","nghề làm bánh truyền thống"],
+  tuNgu:["nghệ nhân – người giỏi nghề, được công nhận","tỉ mỉ – cẩn thận từng chi tiết","kiên nhẫn – bền bỉ, không vội vàng","khéo tay","sáng tạo","giữ gìn – bảo tồn","truyền nghề – dạy lại cho thế hệ sau","sản phẩm thủ công","thu nhập","yêu nghề","an toàn lao động","nơi tiêu thụ sản phẩm"],
+  khung:["Quê em có nghề … đã có từ …","Để làm ra một sản phẩm …, người thợ phải …","Người làm nghề này cần phẩm chất …","Em thấy nghề … có ý nghĩa vì …","Nếu sau này …, em sẽ …"],
+  mau:"Nghề làm gốm là một nghề truyền thống lâu đời. Để làm ra một chiếc bình, người thợ phải nhào đất, nặn dáng, phơi khô rồi nung trong lò nhiều giờ. Người làm gốm cần đôi tay khéo léo, tính kiên nhẫn và óc sáng tạo để mỗi sản phẩm có nét riêng. Nghề gốm không chỉ đem lại thu nhập mà còn giữ gìn nét đẹp văn hoá của làng. Em mong nghề sẽ được truyền lại cho thế hệ trẻ."}
+];
+const TEN_BAC = ["Ý tưởng","Từ ngữ","Khung câu","Bài mẫu khác chủ đề"];
+const MAU_BAC = ["var(--b1)","var(--b2)","var(--b3)","var(--b4)"];
+const MAU_BAC_HEX = ["#0e9f9a","#2563eb","#7c3aed","#f97316"];
+
+/* =====================================================================
+   2. TIỆN ÍCH
+   ===================================================================== */
+const $ = s => document.querySelector(s);
+const esc = s => String(s == null ? "" : s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const dem = t => (t.trim().match(/[A-Za-zÀ-ỹ']+/g) || []).length;
+const nay = () => Date.now();
+const kho = {
+  doc(k, md){ try { const v = localStorage.getItem("tgm3_" + k); return v ? JSON.parse(v) : md; } catch(e){ return md; } },
+  ghi(k, v){ try { localStorage.setItem("tgm3_" + k, JSON.stringify(v)); } catch(e){} },
+  xoa(k){ try { localStorage.removeItem("tgm3_" + k); } catch(e){} }
+};
+const coAppsScript = () => !!(window.google && google.script && google.script.run);
+/* Bản cài màn hình chính (GitHub Pages…) KHÔNG tự gửi gì lên mạng: mất mạng thì cất bài vào máy HS;
+   có mạng, HS bấm «Gửi bài đã cất» → mở trang Apps Script của thầy cô (link /exec), chính trang đó nộp như thường. */
+const API_GOC = "https://script.google.com/macros/s/AKfycbzDHbk2fJb_zUANBMdL6buLCw6kyq_NLbX7cs2aKhg9yTkoMaHHLzDple5HWPxujGJz/exec";
+const BAN_CAI = "";   // link bản cài màn hình chính, VD https://ten.github.io/thang-goi-mo/ — điền khi đã đưa lên
+const coMayChu = () => coAppsScript();
+const coDuongGui = () => coAppsScript() || !!API_GOC;
+const laWebCai = () => location.protocol === "https:" && !/(google\.com|googleusercontent\.com)$/.test(location.hostname) || location.hostname === "localhost";
+const daCai = () => (window.matchMedia && matchMedia("(display-mode: standalone)").matches) || navigator.standalone === true;
+const loiMang = m => Object.assign(new Error(m || "Máy đang mất mạng"), {matMang:true});
+function may(ham, ...args){
+  if (!coAppsScript()) return Promise.reject(loiMang("Cần mở bằng link của cô"));
+  return new Promise((ok, loi) => google.script.run.withSuccessHandler(ok)
+    .withFailureHandler(e => loi(/network|connection|HTTP 0/i.test(e && e.message || "") ? loiMang() : Object.assign(new Error(e && e.message || "Lỗi máy chủ"), {tuChoi:true})))[ham](...args));
+}
+/* Hàng chờ trên máy HS: chỉ cất mã HS (lớp–STT), mã đề, mã nộp bài, câu thắc mắc — không có họ tên. */
+const HAM_CAT = ["nopBai", "guiThacMac", "ghiBatDau"];
+function catHang(ham, args){ const h = kho.doc("hangCho", []); h.push({ham, args, t:Date.now()}); kho.ghi("hangCho", h.slice(-100)); baoMang(); }
+async function guiHoacCat(ham, args){
+  if (!coAppsScript()){ catHang(ham, args); return "cat"; }
+  for (let lan = 0; lan < 3; lan++){
+    try { return await may(ham, ...args); }
+    catch(e){ if (e.tuChoi) throw e; if (navigator.onLine === false) break; await new Promise(r => setTimeout(r, 1500 * (lan + 1))); }
+  }
+  catHang(ham, args); return "cat";
+}
+/* Trang Apps Script: tự gửi hàng chờ của chính nó (mạng chập chờn) */
+let dangGuiHang = false;
+async function guiHang(){
+  if (dangGuiHang || navigator.onLine === false || !coAppsScript()) return;
+  const h = kho.doc("hangCho", []); if (!h.length) return;
+  dangGuiHang = true; let n = 0;
+  try {
+    while (h.length){
+      try { await may(h[0].ham, ...h[0].args); n++; } catch(e){ if (!e.tuChoi) break; }
+      h.shift(); kho.ghi("hangCho", h);
+    }
+  } finally { dangGuiHang = false; baoMang(); }
+  if (n) mascot(`📶 Có mạng rồi! App đã gửi <b>${n}</b> mục em cất lúc mất mạng cho cô.`);
+}
+/* Bản cài: chuyển hàng chờ sang trang của cô (tối đa 10 mục/lần cho link không quá dài) */
+function chuyenHang(){
+  const h = kho.doc("hangCho", []); if (!h.length || !API_GOC) return;
+  const lo = h.slice(0, 10), goi = b64(new TextEncoder().encode(JSON.stringify(lo.map(x => [x.ham, x.args]))));
+  kho.ghi("daChuyen", kho.doc("daChuyen", []).concat(lo).slice(-30));   // giữ bản sao phòng khi trang của cô chưa nhận
+  kho.ghi("hangCho", h.slice(10)); baoMang();
+  window.open(API_GOC + "#guiCo=" + goi, "_blank", "noopener");
+}
+async function nhanHang(goi){
+  let ds = []; try { ds = JSON.parse(new TextDecoder().decode(tuB64(goi))); } catch(e){}
+  ds = (Array.isArray(ds) ? ds : []).filter(x => Array.isArray(x) && HAM_CAT.includes(x[0]) && Array.isArray(x[1])).slice(0, 10);
+  let n = 0, cat = 0;
+  const o0 = $("#man"); if (o0) o0.insertAdjacentHTML("afterbegin", `<div class="the-cai" id="dangNhan" style="margin-bottom:14px">⏳ Đang gửi cô ${ds.length} mục…</div>`);
+  for (const [ham, args] of ds){ try { (await guiHoacCat(ham, args)) === "cat" ? cat++ : n++; } catch(e){} }
+  const d0 = $("#dangNhan"); if (d0) d0.remove();
+  const loi = n ? `✅ Đã gửi cô <b>${n}</b> mục em cất trong bản cài. Em đóng trang này, quay lại app nhé.`
+    : cat ? "📦 Mạng còn yếu — trang này đã cất lại, có mạng ổn là tự gửi cô."
+    : "Chưa gửi được. Em quay lại app, bấm <b>📋 Chép mã</b> và gửi cô nhé.";
+  const o = $("#man"); if (o) o.insertAdjacentHTML("afterbegin", `<div class="the-cai" style="font-size:18px;margin-bottom:14px"><span class="icon">${n ? "📬" : "📦"}</span><span style="flex:1">${loi}</span></div>`);
+  mascot(loi, n ? "" : "nghi");
+}
+function baoMang(){
+  let o = document.getElementById("trangThaiMang"); if (!o){ o = document.createElement("div"); o.id = "trangThaiMang"; document.body.appendChild(o); }
+  const n = kho.doc("hangCho", []).length, mat = navigator.onLine === false, banCai = !coAppsScript();
+  o.classList.toggle("hien", mat || n > 0);
+  o.style.cursor = !mat && n && banCai ? "pointer" : "";
+  o.textContent = mat ? `📴 Đang mất mạng — em vẫn luyện bình thường${n ? ` · ${n} mục đã cất` : ""}`
+    : !n ? "" : banCai ? `📶 Có mạng rồi — bấm đây để gửi ${n} mục đã cất cho cô` : `📦 ${n} mục chờ gửi cô — có mạng là tự gửi`;
+}
+document.addEventListener("click", e => { if (e.target.id === "trangThaiMang" && navigator.onLine !== false && !coAppsScript()) chuyenHang(); });
+window.addEventListener("online", () => { baoMang(); guiHang(); });
+window.addEventListener("offline", baoMang);
+document.addEventListener("visibilitychange", () => { if (!document.hidden){ baoMang(); guiHang(); } });
+let loiMoiCai = null;
+window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); loiMoiCai = e; const b = document.getElementById("nCai"); if (b) b.classList.remove("an"); });
+if (laWebCai()){
+  [["manifest", "manifest.webmanifest"], ["apple-touch-icon", "apple-touch-icon.png"]].forEach(([rel, href]) => { const l = document.createElement("link"); l.rel = rel; l.href = href; document.head.appendChild(l); });
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+}
+function theCai(){
+  if (daCai()) return "";
+  const ios = /iphone|ipad|ipod/i.test(navigator.userAgent);
+  if (laWebCai()) return `<div class="the-cai"><span class="icon">📲</span><span style="flex:1;min-width:220px"><b>Cài app lên màn hình chính — mất mạng vẫn dùng được</b><br>
+    <span class="nho">${ios ? "iPhone: mở bằng <b>Safari</b> → bấm nút <b>Chia sẻ ⬆</b> → <b>Thêm vào MH chính</b>." : "Android: bấm <b>Cài app</b> bên cạnh, hoặc Chrome <b>⋮</b> → <b>Thêm vào màn hình chính</b>."} Lần đầu cần có mạng.</span></span>
+    <button class="nut xanh ${loiMoiCai ? "" : "an"}" id="nCai">📲 Cài app</button></div>`;
+  if (BAN_CAI) return `<div class="the-cai"><span class="icon">📲</span><span style="flex:1;min-width:220px"><b>Nhà em hay mất mạng?</b><br><span class="nho">Mở <a href="${BAN_CAI}" target="_blank" rel="noopener">bản cài màn hình chính</a> khi có mạng, cài 1 lần — sau đó tắt mạng vẫn luyện được.</span></span></div>`;
+  return "";
+}
+function ngauNhien(seed){ let s = seed >>> 0; return () => (s = (s * 1664525 + 1013904223) >>> 0) / 4294967296; }
+
+/* Âm thanh WebAudio — không cần file */
+let am = null;
+function keu(loai){
+  try {
+    am = am || new (window.AudioContext || window.webkitAudioContext)();
+    const o = am.createOscillator(), g = am.createGain(), t = am.currentTime;
+    const ds = {ting:[880,1320,.18,"sine"], mo:[523,784,.22,"triangle"], chan:[220,160,.18,"square"], xong:[660,1320,.4,"sine"]}[loai] || [600,600,.1,"sine"];
+    o.type = ds[3]; o.frequency.setValueAtTime(ds[0], t); o.frequency.exponentialRampToValueAtTime(ds[1], t + ds[2]);
+    g.gain.setValueAtTime(.12, t); g.gain.exponentialRampToValueAtTime(.001, t + ds[2] + .15);
+    o.connect(g); g.connect(am.destination); o.start(t); o.stop(t + ds[2] + .2);
+  } catch(e){}
+}
+function phaoGiay(){
+  const p = $("#phao"); p.innerHTML = "";
+  const mau = MAU_BAC_HEX.concat(["#fbbf24","#16a34a"]);
+  for (let i = 0; i < 70; i++){
+    const d = document.createElement("i");
+    d.style.left = (Math.random() * 100) + "vw"; d.style.background = mau[i % mau.length];
+    d.style.animationDelay = (Math.random() * .5) + "s"; d.style.animationDuration = (1.2 + Math.random()) + "s";
+    p.appendChild(d);
+  }
+  setTimeout(() => p.innerHTML = "", 2600);
+}
+
+/* Mã hoá bài nộp: JSON → nén (nếu trình duyệt có) → base64url. Không gửi đi đâu. */
+function b64(u8){ let s = ""; for (let i = 0; i < u8.length; i += 8192) s += String.fromCharCode.apply(null, u8.subarray(i, i + 8192)); return btoa(s).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,""); }
+function tuB64(s){ s = s.replace(/-/g,"+").replace(/_/g,"/"); while (s.length % 4) s += "="; const b = atob(s), u = new Uint8Array(b.length); for (let i = 0; i < b.length; i++) u[i] = b.charCodeAt(i); return u; }
+async function quaLuong(u8, luong){ const r = new Blob([u8]).stream().pipeThrough(luong); return new Uint8Array(await new Response(r).arrayBuffer()); }
+async function maHoa(obj){
+  const u = new TextEncoder().encode(JSON.stringify(obj));
+  try { if (window.CompressionStream) return "TGM3z." + b64(await quaLuong(u, new CompressionStream("deflate-raw"))); } catch(e){}
+  return "TGM3." + b64(u);
+}
+async function giaiMa(ma){
+  ma = ma.trim();
+  if (ma.startsWith("TGM3z.")) return JSON.parse(new TextDecoder().decode(await quaLuong(tuB64(ma.slice(6)), new DecompressionStream("deflate-raw"))));
+  if (ma.startsWith("TGM3.")) return JSON.parse(new TextDecoder().decode(tuB64(ma.slice(5))));
+  throw new Error("không phải mã Thang Gợi Mở");
+}
+/* Dòng thời gian viết: lưu phần thay đổi so với lần trước (gọn) */
+function khacBiet(cu, moi){ let p = 0; while (p < cu.length && p < moi.length && cu[p] === moi[p]) p++; let s = 0; while (s < cu.length - p && s < moi.length - p && cu[cu.length - 1 - s] === moi[moi.length - 1 - s]) s++; return [p, cu.length - p - s, moi.slice(p, moi.length - s)]; }
+function hoiThu(){
+  return [
+    {ma:"7A-05", mon:"Toán", lop:7, cau:"Tìm x biết 3x + 5 = 20, em làm mãi không ra", daNghi:"1. đề cho 3x+5=20 | 2. tìm x", goiY:"Em thử hỏi: muốn còn lại 3x ở một vế thì phải bớt đi số nào ở cả hai vế? Sau đó 3x = … thì x bằng bao nhiêu? Tra SGK: Toán 7, bài có từ khoá “quy tắc chuyển vế”.", duyet:true},
+    {ma:"8B-11", mon:"KHTN", lop:8, cau:"Vì sao thả viên đá vào nước thì chìm mà gỗ lại nổi?", daNghi:"1. đá chìm gỗ nổi | 2. đã thấy ở ao", goiY:"Em so sánh: cùng một thể tích, đá và gỗ cái nào nặng hơn? Nước ‘đẩy lên’ vật nhiều hay ít phụ thuộc vào điều gì? Tra SGK: KHTN 8, bài có từ khoá “khối lượng riêng”, “lực đẩy”.", vanDe:"Cần nêu đúng tên bài theo SGK lớp 8 — thầy/cô kiểm tra mục lục"},
+    {ma:"7C-02", mon:"Lịch sử", lop:7, cau:"Vì sao nhà Lý dời đô về Thăng Long?", daNghi:"", goiY:""},
+    {ma:"8A-20", mon:"GDCD", lop:8, cau:"Bạn em bị nói xấu trên mạng thì em nên làm gì?", daNghi:"1. bạn bị nói xấu | 2. không đúng", goiY:""},
+    {ma:"7B-09", mon:"Tin học", lop:7, cau:"Chương trình Scratch của em chạy nhân vật không di chuyển", daNghi:"", goiY:""}];
+}
+function dungLai(tl){ const ra = []; let t = ""; for (const [giay, p, xoa, them] of tl){ t = t.slice(0, p) + them + t.slice(p + xoa); ra.push([giay, t]); } return ra; }
+async function chep(chu){
+  try { await navigator.clipboard.writeText(chu); return true; } catch(e){}
+  try { const t = document.createElement("textarea"); t.value = chu; document.body.appendChild(t); t.select(); const ok = document.execCommand("copy"); t.remove(); return ok; } catch(e){ return false; }
+}
+
+/* =====================================================================
+   3. BÀI: GỐC + BÀI THẦY CÔ TỰ SOẠN (link #bai-moi=…)
+   ===================================================================== */
+const baiRieng = () => kho.doc("bai", []);
+const tatCaBai = () => BAI_GOC.concat(baiRieng());
+const timBai = id => tatCaBai().find(b => b.id === id) || BAI_GOC[2];
+
+/* =====================================================================
+   4. CHẨN ĐOÁN BẢN NHÁP — chạy ngay trên máy, không gọi mạng
+   ===================================================================== */
+const DUNG_VI = new Set("và là của em những các một có thì mà cho với được không rất này đó khi để trong người cũng đã sẽ nhiều ở vì nên các bạn chúng ta".split(" "));
+const CO_DAU = /[àáảãạăằắẳẵặâầấẩẫậđèéẻẽẹêềếểễệìíỉĩịòóỏõọôồốổỗộơờớởỡợùúủũụưừứửữựỳýỷỹỵ]/i;
+function soiTiengViet(chu, loi, dem1){
+  const tu = []; let m; const re = /[A-Za-zÀ-ỹ]+/g;
+  while ((m = re.exec(chu))) tu.push({t:m[0].toLowerCase(), bd:m.index, kt:m.index + m[0].length});
+  if (tu.length >= 15 && tu.filter(x => CO_DAU.test(x.t)).length / tu.length < .15){
+    tu.slice(0, 3).forEach(x => loi.push({id:"kd", bd:x.bd, kt:x.kt})); dem1.kd = 1;
+  }
+  const cau = /[^.!?…]+[.!?…]*/g;
+  while ((m = cau.exec(chu))){ if (dem(m[0]) > 45){ const bd = m.index + (m[0].length - m[0].trimStart().length); loi.push({id:"cd", bd, kt:m.index + m[0].trimEnd().length}); dem1.cd = (dem1.cd || 0) + 1; } }
+  const cap = {};
+  for (let i = 0; i + 1 < tu.length; i++){
+    if (DUNG_VI.has(tu[i].t) || DUNG_VI.has(tu[i + 1].t) || tu[i].t.length < 2) continue;
+    const k = tu[i].t + " " + tu[i + 1].t; (cap[k] = cap[k] || []).push([tu[i].bd, tu[i + 1].kt]);
+  }
+  for (const k in cap) if (cap[k].length >= 3){ cap[k].slice(1).forEach(([bd, kt]) => loi.push({id:"lt", bd, kt})); dem1.lt = (dem1.lt || 0) + 1; }
+}
+function demChuoi(chu, tu){ chu = chu.normalize("NFC").toLowerCase(); tu = tu.normalize("NFC").toLowerCase().trim(); if (!tu) return 0; let n = 0, i = 0; while ((i = chu.indexOf(tu, i)) >= 0){ n++; i += tu.length; } return n; }
+function chanDoan(chu, bai){
+  const loi = [], dem1 = {};
+  for (const L of boLoi(bai)){
+    if (!L.re) continue;
+    L.re.lastIndex = 0; let m;
+    while ((m = L.re.exec(chu))){
+      let bd = m.index, kt = m.index + m[0].length;
+      if (L.nhom){ bd = m.index + m[1].length; kt = bd + m[0].length - m[1].length; }
+      if (L.bo && L.bo(chu, m.index, m[0])) { if (!m[0].length) L.re.lastIndex++; continue; }
+      if (kt > bd){ loi.push({id:L.id, bd, kt}); dem1[L.id] = (dem1[L.id] || 0) + 1; }
+      if (!m[0].length) L.re.lastIndex++;
+      if (L.id === "vn" && dem1.vn >= 6) break;
+    }
+  }
+  if (!laAnh(bai)) soiTiengViet(chu, loi, dem1);
+  const gon = chu.trimEnd();
+  if (dem(gon) >= 4 && !/[.!?…]["')»]?$/.test(gon)){ loi.push({id:"ne", bd:gon.length - 1, kt:gon.length}); dem1.ne = 1; }
+  const chuan = bai.ct.map(([k, can]) => {
+    if (k.startsWith("tk:")){ const co = demChuoi(chu, k.slice(3)); return {k, nhan:"Có từ khoá “" + k.slice(3) + "”", co, can, ok:co >= can}; }
+    const c = CAU_TRUC[k]; if (!c) return {k, nhan:k, co:0, can, ok:true};
+    c.re.lastIndex = 0; const co = (chu.match(c.re) || []).length; return {k, nhan:c.nhan, co, can, ok:co >= can}; });
+  const w = dem(chu);
+  return {loi, dem:dem1, chuan, w, duTu:w >= bai.tu[0], vuot:w > bai.tu[1] * 1.3};
+}
+function veGuong(chu, loi, thuTu){
+  const ds = loi.slice().sort((a, b) => a.bd - b.bd || b.kt - a.kt);
+  let ra = "", vt = 0;
+  for (const l of ds){
+    if (l.bd < vt) continue;
+    ra += esc(chu.slice(vt, l.bd)) + `<mark title="${esc(TEN_LOI[l.id])}">${esc(chu.slice(l.bd, l.kt)) || "&nbsp;"}<sup>${thuTu[l.id]}</sup></mark>`;
+    vt = l.kt;
+  }
+  return ra + esc(chu.slice(vt));
+}
+
+/* =====================================================================
+   5. PHIÊN VIẾT CỦA HỌC SINH
+   ===================================================================== */
+let P = null;   // phiên đang viết
+function moiPhien(bai, ma){
+  const khoa = "nhap_" + bai.id + "_" + ma, cu = kho.doc(khoa, null);
+  if (cu && !cu.xong) return cu;
+  return {khoa, bai:bai.id, ma, t0:nay(), chu:"", go:0, dan:[], bac:[0, -1, -1, -1], kiem:[], tl:[], tlCuoi:"", tlT:0, md:"", ai:"", cuu:[], da:0, xong:false};
+}
+const giay = () => Math.round((nay() - P.t0) / 1000);
+function chup(ep){
+  const t = giay();
+  if (!ep && t - P.tlT < 2 && Math.abs(P.chu.length - P.tlCuoi.length) < 15) return;
+  if (P.chu === P.tlCuoi && !ep) return;
+  P.tl.push([t].concat(khacBiet(P.tlCuoi, P.chu))); P.tlCuoi = P.chu; P.tlT = t;
+  if (P.tl.length > 400) P.tl.splice(1, 1);
+}
+const luuNhap = () => kho.ghi(P.khoa, P);
+
+function mascot(loi, kieu){
+  const o = $("#loiCu"), cu = $("#cuSvg");
+  if (!o) return;
+  o.innerHTML = loi; o.classList.remove("hien"); void o.offsetWidth; o.classList.add("hien");
+  if (cu) cu.classList.toggle("nghi", kieu === "nghi");
+}
+
+/* =====================================================================
+   6. CÁC MÀN HÌNH
+   ===================================================================== */
+let lopChon = kho.doc("lop", 8), monChon = kho.doc("mon", "tat-ca");
+function manTrangChu(){
+  const ma = kho.doc("ma", "");
+  const theoLop = tatCaBai().filter(b => +b.lop === +lopChon);
+  const cacMon = [...new Set(theoLop.map(b => b.mon || "anh"))];
+  if (monChon !== "tat-ca" && !cacMon.includes(monChon)) monChon = "tat-ca";
+  const ds = theoLop.filter(b => monChon === "tat-ca" || (b.mon || "anh") === monChon);
+  return `
+  <section class="hero">
+    <div class="the hien">
+      <div class="nho" style="font-weight:800;color:var(--chinh)">LÕI TIẾNG ANH 6–9 · MỞ CHO MỌI MÔN · PHÂN HIỆU HÙNG TIẾN</div>
+      <h1>Em tự leo — AI chỉ đường,<br>không làm hộ.</h1>
+      <p class="lon">Viết bài bằng chính lời của em. Mỗi bậc gợi ý chỉ mở khi em đã <b>tự viết thêm</b>. Cú Socra hỏi lại, không đưa đáp án.</p>
+      <div class="ba-y">
+        <div class="y"><b>✍️ Viết trước, gợi sau</b>Bậc gợi ý mở dần theo số từ em tự gõ.</div>
+        <div class="y"><b>🔍 Tự soi lỗi</b>Máy gọi tên lỗi và hỏi lại — em tự sửa.</div>
+        <div class="y"><b>📨 Nộp bằng mã</b>Không đăng nhập, không ghi họ tên.</div>
+      </div>
+      <div style="margin-top:16px">
+        <label class="nho" for="oMa"><b>Mã của em</b> (lớp–số thứ tự, VD <b>8A-12</b> — không ghi họ tên):</label>
+        <div class="o-ma"><input id="oMa" maxlength="8" value="${esc(ma)}" placeholder="8A-12" autocomplete="off"><span class="nho" id="baoMa"></span></div>
+      </div>
+    </div>
+    <div class="hero-hinh">${hinhLon()}</div>
+  </section>
+  ${theCai()}
+  <a class="cua-hoi hien" href="#hoi">
+    <span class="cua-hoi-icon">🧭</span>
+    <span><b>Em đang bí bài nào? Hỏi gia sư</b><br><span>Mọi môn THCS · mọi câu hỏi · gia sư dẫn em từng bước, không làm hộ</span></span>
+    <span class="cua-hoi-mui">Hỏi ngay ➜</span>
+  </a>
+  <h2 style="margin:18px 0 0">🧗 Luyện viết theo đề của thầy cô</h2>
+  <p class="nho">Đề mẫu có sẵn — thầy cô thêm được bao nhiêu đề tuỳ ý ở mục ✍️ Soạn.</p>
+  <div class="tab-lop">${[6,7,8,9].map(l => `<button data-lop="${l}" class="${+l === +lopChon ? "dang" : ""}">Lớp ${l}</button>`).join("")}</div>
+  ${cacMon.length > 1 ? `<div class="loc-mon">${["tat-ca"].concat(cacMon).map(m => `<span class="chip ${m === monChon ? "chon" : ""}" data-mon="${m}">${m === "tat-ca" ? "Tất cả môn" : esc(MON[m])}</span>`).join("")}</div>` : ""}
+  <div class="ds-bai">${ds.length ? ds.map(b => `
+    <button class="the-bai hien" data-bai="${esc(b.id)}">${HINH[b.hinh] || HINH.rieng}
+      <span><span class="nhan">${esc(MON[b.mon || "anh"])} · ${esc(b.unit)}</span><br><span class="td">${esc(laAnh(b) ? (b.deVi || b.de) : b.de)}</span><br>
+      <span class="nho">${b.tu[0]}–${b.tu[1]} ${dv(b)} · 4 bậc gợi mở</span>${b.rieng ? `<br><span class="huy-gv">✔ Thầy/cô đã duyệt</span>` : ""}</span></button>`).join("")
+    : `<div class="the nho">Lớp ${lopChon} chưa có đề. Thầy/cô vào <b>✍️ Soạn thang</b> để thêm.</div>`}</div>`;
+}
+function hinhLon(){
+  return `<svg viewBox="0 0 340 300" style="width:100%;height:auto">
+    <rect x="10" y="10" width="320" height="280" rx="28" fill="url(#gTroi)"/>
+    <circle cx="268" cy="62" r="26" fill="#fde68a"/>
+    <path d="M10 236q80-40 160-10t160-14v78H10z" fill="#bbf7d0"/>
+    <g transform="translate(118 40)">
+      <path d="M0 220V0M84 220V0" stroke="url(#gThang)" stroke-width="9" stroke-linecap="round"/>
+      ${[0,1,2,3].map(i => `<path d="M0 ${190 - i * 50}h84" stroke="${MAU_BAC_HEX[i]}" stroke-width="10" stroke-linecap="round"/>
+        <text x="96" y="${195 - i * 50}" font-size="13" font-weight="800" fill="${MAU_BAC_HEX[i]}">${i + 1} · ${["Ý tưởng","Từ ngữ","Khung câu","Mẫu khác"][i]}</text>`).join("")}
+    </g>
+    <g style="animation:noi 3s ease-in-out infinite"><use href="#cu" x="40" y="120" width="96" height="100"/></g>
+    <g transform="translate(36 70)"><rect width="104" height="40" rx="14" fill="#fff" stroke="#dbe4f5" stroke-width="2"/><text x="52" y="25" text-anchor="middle" font-size="13" font-weight="700" fill="#14213d">Em nghĩ sao?</text></g>
+  </svg>`;
+}
+
+function manViet(bai, mau){
+  return `
+  <div class="viet">
+    <section class="o-de the de-bai">
+      <div style="display:flex;gap:12px;align-items:center"><div style="width:58px;flex-shrink:0">${HINH[bai.hinh] || HINH.rieng}</div>
+      <div><div class="nhan">Lớp ${bai.lop} · ${esc(MON[bai.mon || "anh"])} · ${esc(bai.unit)}</div><div class="nho">Mã: <b id="hienMa">${esc(P.ma)}</b></div></div></div>
+      <div class="cau">${esc(bai.de)}</div>
+      <div class="nho">${esc(bai.deVi || "")}</div>
+      <div class="chuan" id="dsChuan"></div>
+    </section>
+    <section class="o-viet the">
+      <div class="cu-hang">
+        <svg class="cu" id="cuSvg" viewBox="0 0 100 104"><use href="#cu"/></svg>
+        <div class="loi-cu" id="loiCu"></div>
+      </div>
+      <textarea class="o-go" id="oGo" spellcheck="false" autocapitalize="sentences" placeholder="${laAnh(bai) ? "Em viết bằng tiếng Anh ở đây — bằng chính lời của em…" : "Em viết ở đây — bằng chính lời của em…"}"></textarea>
+      <div class="thanh-tu"><span id="soTu">0 ${dv(bai)}</span><div class="vach" id="vach"><i></i></div><span>${bai.tu[0]}–${bai.tu[1]}</span></div>
+      <div class="nho" id="baoKhoa"></div>
+      <div class="hang-nut">
+        <button class="nut phu2" id="nKiem">🔍 Tự soi bản nháp</button>
+        <button class="nut cam an" id="nCuu">🆘 Cứu hộ</button>
+        <button class="nut xanh" id="nNop">✅ Nộp bài</button>
+      </div>
+    </section>
+    <section class="o-thang the">
+      <h3>🧗 Thang gợi mở — mở dần khi em tự viết</h3>
+      <svg class="thang-svg" id="thangSvg" viewBox="0 0 300 150"></svg>
+      <div id="dsBac"></div>
+    </section>
+    <section class="o-soi the ${mau === "kiem" ? "" : "an"}" id="oSoi"></section>
+  </div>`;
+}
+function veThang(bai){
+  const w = dem(P.chu), dich = bai.tu[0], tl = Math.min(1, w / dich);
+  const x0 = 20, x1 = 280;
+  let s = `<rect x="0" y="0" width="300" height="150" rx="16" fill="#f6f9ff"/>
+    <path d="M${x0} 112H${x1}M${x0} 132H${x1}" stroke="url(#gThang)" stroke-width="6" stroke-linecap="round"/>`;
+  for (let i = 0; i < 4; i++){
+    const x = x0 + 20 + i * 72, mo = P.bac[i] >= 0, duoc = i === 0 || dem(P.chu) >= bai.mo[i];
+    const mau = mo ? MAU_BAC_HEX[i] : (duoc ? "#93a4c3" : "#c3cad8");
+    s += `<path d="M${x} 104v36" stroke="${mau}" stroke-width="9" stroke-linecap="round"/>
+      <circle cx="${x}" cy="84" r="15" fill="${mo ? MAU_BAC_HEX[i] : "#fff"}" stroke="${mau}" stroke-width="3"/>
+      <text x="${x}" y="89" text-anchor="middle" font-size="14" font-weight="900" fill="${mo ? "#fff" : mau}">${mo ? "✓" : (duoc ? i + 1 : "🔒")}</text>
+      <text x="${x}" y="58" text-anchor="middle" font-size="10.5" font-weight="800" fill="${mau}">${TEN_BAC[i].split(" ")[0]} ${TEN_BAC[i].split(" ")[1] || ""}</text>`;
+  }
+  const cx = x0 + tl * (x1 - x0 - 30);
+  s += `<use href="#cu" x="${cx - 4}" y="0" width="42" height="44"/>
+    <rect x="${x0}" y="140" width="${(x1 - x0) * tl}" height="5" rx="2.5" fill="#16a34a"/>`;
+  $("#thangSvg").innerHTML = s;
+}
+function veBac(bai){
+  const w = dem(P.chu);
+  $("#dsBac").innerHTML = TEN_BAC.map((ten, i) => {
+    const mo = P.bac[i] >= 0, duoc = i === 0 || (w >= bai.mo[i] && P.bac[i - 1] >= 0), con = Math.max(0, bai.mo[i] - w);
+    const tt = mo ? "✅ Đã mở" : duoc ? "🔓 Bấm để mở" : (P.bac[i - 1] < 0 && w >= bai.mo[i] ? `🔒 Mở bậc ${i} trước` : `🔒 Tự viết thêm ${con} ${dv(bai)}`);
+    let than = "";
+    if (mo){
+      if (i === 0) than = `<p>${esc(bai.cauHoi)}</p><div style="margin-top:6px">${bai.chon.map(c => `<span class="chip" data-y="${esc(c)}">${esc(c)}</span>`).join("")}</div>`;
+      if (i === 1) than = `<div class="tu-bang">${bai.tuNgu.map(t => `<span>${esc(t)}</span>`).join("")}</div><p class="nho" style="margin-top:6px">Em tự chọn từ hợp với ý của mình — không cần dùng hết${laAnh(bai) ? "" : ", và viết theo cách nói của em"}.</p>`;
+      if (i === 2) than = bai.khung.map(k => `<div class="khung-cau">${esc(k)}</div>`).join("") + `<p class="nho">Dấu “…” là chỗ của ý tưởng THẬT của em.</p>`;
+      if (i === 3) than = `<div class="mau-khac">${esc(bai.mau)}</div><div class="canh-bao-mau">⚠ Bài mẫu viết về chủ đề KHÁC — chỉ để em xem cách sắp xếp câu. Chép lại sẽ lạc đề.</div>`;
+    }
+    return `<div class="bac ${mo || duoc ? "" : "khoa"}"><button class="bac-dau" data-bac="${i}" ${mo || !duoc ? "disabled" : ""}>
+      <span class="bac-so" style="background:${MAU_BAC[i]}">${i + 1}</span><span class="bac-ten">${TEN_BAC[i]}</span><span class="bac-tt">${tt}</span></button>
+      ${mo ? `<div class="bac-than">${than}</div>` : ""}</div>`;
+  }).join("");
+}
+function veChuan(bai, kq){
+  kq = kq || chanDoan(P.chu, bai);
+  $("#dsChuan").innerHTML = `<div class="${kq.duTu ? "ok" : ""}"><span class="dau">${kq.duTu ? "✓" : "·"}</span>Đủ ${bai.tu[0]} ${dv(bai)} (đang có ${kq.w})</div>` +
+    kq.chuan.map(c => `<div class="${c.ok ? "ok" : ""}"><span class="dau">${c.ok ? "✓" : "·"}</span>${esc(c.nhan)} — ${Math.min(c.co, c.can)}/${c.can}</div>`).join("");
+}
+function capNhatViet(bai){
+  const w = dem(P.chu);
+  $("#soTu").textContent = w + " " + dv(bai);
+  const v = $("#vach i"); v.style.width = Math.min(100, w / bai.tu[1] * 100) + "%";
+  if (!$("#vach .moc")) bai.mo.slice(1).forEach(m => { const d = document.createElement("span"); d.className = "moc"; d.style.left = (m / bai.tu[1] * 100) + "%"; $("#vach").appendChild(d); });
+  const truoc = $("#dsBac").dataset.k, k = bai.mo.map((m, i) => (i === 0 || w >= m) ? 1 : 0).join("") + P.bac.join(",");
+  if (truoc !== k){
+    const moiMo = bai.mo.findIndex((m, i) => i > 0 && P.bac[i] < 0 && w >= m && P.bac[i - 1] >= 0 && truoc && truoc[i] === "0");
+    veBac(bai); $("#dsBac").dataset.k = k;
+    if (moiMo > 0){ keu("ting"); mascot(`Giỏi quá — em đã <b>tự viết ${w} ${dv(bai)}</b>! Bậc ${moiMo + 1} · ${TEN_BAC[moiMo]} vừa mở khoá. Em muốn tự viết tiếp hay mở xem?`); }
+  }
+  veThang(bai); veChuan(bai);
+}
+function moBac(bai, i){
+  P.bac[i] = giay(); chup(true); luuNhap(); keu("mo"); veBac(bai); $("#dsBac").dataset.k = ""; capNhatViet(bai);
+  const loi = [
+    `${esc(bai.cauHoi)}`,
+    `Đây là kho từ ngữ. Em chọn <b>một từ</b> hợp với ý của em nhất — em sẽ đặt nó vào câu nào?`,
+    `Khung câu chỉ là điểm tựa. Ý tưởng thật của em sẽ điền vào chỗ “…” như thế nào?`,
+    `Bài mẫu nói về chủ đề khác. Em thấy người viết <b>mở bài</b> bằng câu gì? Câu mở bài của em sẽ khác ra sao?`][i];
+  mascot(loi, "nghi");
+}
+const CO_DAP_AN = new Set(["vl","be","s3","lb","et","th","mb","pp","dc","li","sc","ne","tn","hv"]);
+const moDapAn = id => (P.cuu && P.cuu.length) || (P.kiem.length >= 2 && (P.kiem[P.kiem.length - 2].n || {})[id]);
+function oDapAn(L, kq){
+  if (!CO_DAP_AN.has(L.id)) return `<div class="nho" style="margin-top:4px">Lỗi này không có một đáp án duy nhất — em tự quyết định cách sửa.</div>`;
+  if (!moDapAn(L.id)) return `<div class="nho" style="margin-top:4px">🔒 Em tự sửa thử rồi bấm <b>Tự soi</b> lần nữa — nếu vẫn còn lỗi này, <b>đáp án chuẩn</b> sẽ mở.</div>`;
+  return `<br><button class="nut phu2 nho2" data-da="${L.id}">🔑 Xem đáp án chuẩn</button><div class="da an" id="da-${L.id}">` +
+    kq.loi.filter(l => l.id === L.id).slice(0, 5).map(l => { const sai = P.chu.slice(l.bd, l.kt), dung = dapAn(L.id, sai);
+      return dung ? `<div><span class="sai">${esc(sai)}</span> → <span class="dung">${esc(dung)}</span></div>` : ""; }).join("") +
+    `<div class="nho">Vì: ${esc(LY_DO[L.id] || "")}</div></div>`;
+}
+function soi(bai, ghi = true){
+  const kq = chanDoan(P.chu, bai);
+  if (ghi){ P.kiem.push({t:giay(), n:kq.dem, w:kq.w}); chup(true); luuNhap(); }
+  const o = $("#oSoi"); o.classList.remove("an");
+  const loai = boLoi(bai).filter(L => kq.dem[L.id]);
+  const thuTu = {}; loai.forEach((L, i) => thuTu[L.id] = i + 1);
+  o.innerHTML = `<h3>🔍 Gương soi bản nháp <span class="nho">(lần ${P.kiem.length} · chạy ngay trên máy, không gửi đi đâu)</span></h3>
+    <div class="guong">${veGuong(P.chu, kq.loi, thuTu) || "<span class='nho'>Em chưa viết gì.</span>"}</div>
+    <div class="ds-loi">${loai.length ? loai.map(L => `<div class="loi hien"><span class="so">${thuTu[L.id]}</span><div><b>${esc(L.ten)} (${kq.dem[L.id]})</b>${esc(L.hoi)}${oDapAn(L, kq)}</div></div>`).join("")
+      : `<div class="loi khong-loi"><span class="so" style="background:var(--dung)">✓</span><div><b>Máy chưa thấy lỗi quen thuộc nào.</b>Em vẫn đọc to lại một lượt nhé — máy không bắt được mọi lỗi${laAnh(bai) ? "" : ", và máy không chấm ý — ý hay hay chưa là thầy/cô đọc"}.</div></div>`}</div>`;
+  veChuan(bai, kq);
+  const thieu = kq.chuan.find(c => !c.ok);
+  if (!ghi) return;
+  if (P.kiem.length >= 2){ const tong = n => Object.values(n || {}).reduce((a, b) => a + b, 0);
+    if (loai.length && tong(P.kiem[P.kiem.length - 1].n) >= tong(P.kiem[P.kiem.length - 2].n)) hienCuu(bai, "khong-tien"); }
+  if (loai.length){ keu("chan"); o.classList.add("rung"); setTimeout(() => o.classList.remove("rung"), 400);
+    mascot(`Em đã tự viết <b>${kq.w} ${dv(bai)}</b> — tốt lắm! Có ${loai.length} loại chỗ cần xem lại. Bắt đầu với số ${thuTu[loai[0].id]}: ${esc(loai[0].hoi)}`, "nghi"); }
+  else if (!kq.duTu) mascot(`Chưa thấy lỗi quen thuộc! Bài cần ít nhất <b>${bai.tu[0]} ${dv(bai)}</b>, em đang có ${kq.w}. Em còn muốn kể thêm điều gì về ý của mình?`, "nghi");
+  else if (thieu) mascot(`Câu chữ rất ổn! Bài còn thiếu: <b>${esc(thieu.nhan)}</b>. Em có thể thêm một câu dùng nó không?`, "nghi");
+  else { keu("ting"); mascot(`Tuyệt vời! Bài đạt các tiêu chí. Em đọc to lại một lượt — có câu nào em muốn nói <b>hay hơn</b> không? Xong thì bấm Nộp bài nhé.`); }
+  if (window.innerWidth < 900) o.scrollIntoView({behavior:"smooth", block:"start"});
+}
+function ganViet(bai){
+  const ta = $("#oGo");
+  ta.value = P.chu;
+  const chanDan = e => { e.preventDefault(); P.dan.push(giay()); luuNhap(); if (P.dan.length >= 2) setTimeout(() => hienCuu(bai, "dan"), 2500); keu("chan"); ta.classList.add("rung"); setTimeout(() => ta.classList.remove("rung"), 400);
+    mascot(`Cô biết em muốn làm nhanh 🙂 Nhưng <b>não của em</b> mới là cỗ máy cần chạy. Ở đây không dán được — em gõ câu đầu bằng lời của mình nhé: em định mở bài bằng ý nào?`, "nghi"); };
+  ta.addEventListener("beforeinput", e => { if (/^insertFrom(Paste|Drop|Yank)/.test(e.inputType || "")) chanDan(e); });
+  ta.addEventListener("paste", chanDan);
+  ta.addEventListener("drop", chanDan);
+  ta.addEventListener("input", e => {
+    const truoc = P.chu.length; P.chu = ta.value; P.lanCuoi = nay();
+    if ((e.inputType || "insertText").startsWith("insert") && P.chu.length > truoc) P.go += P.chu.length - truoc;
+    if (!P.daBao && P.chu.length > 10 && coMayChu()){ P.daBao = true; guiHoacCat("ghiBatDau", [P.ma, P.bai]).catch(() => {}); }
+    if (/(chán|khó quá|không biết|ko biết|k biết|bỏ cuộc|mệt quá|nản|i don'?t know|idk|too hard|boring)\s*[.!?]*$/i.test(P.chu.slice(-40))) hienCuu(bai, "nan");
+    chup(false); luuNhap(); capNhatViet(bai);
+  });
+  P.lanCuoi = nay();
+  dongHoCuu = setInterval(() => { if (nay() - P.lanCuoi > 120000 && dem(P.chu) < bai.tu[0]) hienCuu(bai, "ngoi-lau"); }, 15000);
+  $("#nCuu").onclick = () => cuuHo(bai);
+  $("#oSoi").addEventListener("click", e => { const b = e.target.closest("[data-da]"); if (!b) return; const d = $("#da-" + b.dataset.da); if (d && d.classList.contains("an")){ d.classList.remove("an"); P.da++; luuNhap(); keu("mo"); } });
+  $("#dsBac").addEventListener("click", e => {
+    const b = e.target.closest("[data-bac]"); if (b && !b.disabled) return moBac(bai, +b.dataset.bac);
+    const c = e.target.closest("[data-y]"); if (c){ document.querySelectorAll("[data-y]").forEach(x => x.classList.toggle("chon", x === c)); mascot(`Em chọn “<b>${esc(c.dataset.y)}</b>”. Điều gì ở nó là <b>chuyện thật</b> của riêng em? Hãy tự viết câu đầu tiên — em bắt đầu bằng từ nào?`, "nghi"); }
+  });
+  $("#nKiem").onclick = () => soi(bai);
+  $("#nNop").onclick = () => {
+    const w = dem(P.chu);
+    if (w < 3){ mascot("Em chưa viết gì để nộp. Thử một câu thật ngắn trước nhé — em định nói gì đầu tiên?", "nghi"); return; }
+    if (w < bai.tu[0] && !confirm(`Bài mới có ${w} ${dv(bai)} (cần ${bai.tu[0]}). Em vẫn nộp chứ?`)) return;
+    const kq = chanDoan(P.chu, bai); P.cuoi = kq.dem; P.so = kq.chuan.filter(c => c.ok).length + "/" + kq.chuan.length;
+    if (!P.kiem.length) P.kiem.push({t:giay(), n:kq.dem, w:kq.w});
+    P.dur = giay(); chup(true); P.xong = true; luuNhap(); kho.ghi("phienCuoi", P);
+    location.hash = "nop";
+  };
+}
+
+/* ---------- Chống nản: Cứu hộ ---------- */
+let dongHoCuu = null;
+function hienCuu(bai, lyDo){
+  const n = $("#nCuu"); if (!n || !n.classList.contains("an") && lyDo === "ngoi-lau") return;
+  n.classList.remove("an"); n.classList.add("nhay");
+  mascot({"ngoi-lau":"Em đang nghĩ à? Bí một chút là bình thường. Bấm <b>🆘 Cứu hộ</b>, cô Cú đưa em một điểm tựa lớn hơn nhé.",
+          "nan":"Cô hiểu, viết bài khó thật đấy 🫶 Mình chia nhỏ ra nhé — bấm <b>🆘 Cứu hộ</b>.",
+          "khong-tien":"Em đã soi mấy lần mà lỗi chưa giảm — không sao cả! Bấm <b>🆘 Cứu hộ</b> để mở <b>đáp án chuẩn</b> của các lỗi.",
+          "dan":"Em đang muốn nhanh cho xong phải không? Bấm <b>🆘 Cứu hộ</b> — có cách nhanh mà vẫn là bài của em."}[lyDo], "nghi");
+}
+function cuuHo(bai){
+  P.cuu.push(giay()); P.lanCuoi = nay();
+  const k = P.bac.findIndex(x => x < 0);
+  if (k > 0){ P.bac[k] = giay(); $("#dsBac").dataset.k = ""; veBac(bai); capNhatViet(bai); }
+  luuNhap(); keu("mo"); $("#nCuu").classList.remove("nhay");
+  if (!$("#oSoi").classList.contains("an")) soi(bai, false);
+  const c = bai.chon || [];
+  mascot(`🆘 Cô Cú đây! ${k > 0 ? `Bậc ${k + 1} · ${TEN_BAC[k]} đã mở cho em. ` : ""}${c.length >= 2 ? `Mình chọn nhanh nhé: em muốn viết về “<b>${esc(c[0])}</b>” hay “<b>${esc(c[1])}</b>”? ` : ""}Câu tiếp theo em có thể bắt đầu bằng: <b>${esc((bai.khung || [""])[Math.min(P.cuu.length - 1, (bai.khung || [""]).length - 1)])}</b>`);
+}
+
+/* ---------- Kết quả & nộp ---------- */
+function soLieu(p){
+  const dau = p.c && p.c.length ? p.c[0].n : {}, cuoi = p.l || {};
+  const tongDau = Object.values(dau).reduce((a, b) => a + b, 0), tongCuoi = Object.values(cuoi).reduce((a, b) => a + b, 0);
+  const bacDung = (p.r || []).filter(x => x >= 0).length;
+  return {tongDau, tongCuoi, suaDuoc:Math.max(0, tongDau - tongCuoi), bacDung, tuLuc:Math.max(0, Math.min(100, Math.round(p.ty)))};
+}
+function goiPhien(p){
+  const bai = timBai(p.bai);
+  return {v:3, ma:p.ma, bai:p.bai, bt:bai.unit, mon:bai.mon || "anh", lop:bai.lop, t0:p.t0, dur:p.dur, w:dem(p.chu), txt:p.chu,
+    ty: p.chu.length ? Math.min(100, p.go / p.chu.length * 100) : 0, pt:p.dan, r:p.bac.slice(1), c:p.kiem, l:p.cuoi || {}, so:p.so || "", md:p.md || "", ai:p.ai || "", cu:(p.cuu || []).length, da:p.da || 0, tl:p.tl};
+}
+function huyChuong(s){
+  const hang = s.bacDung <= 1 && s.tongCuoi <= 1 ? ["Nhà leo núi tự lực","#f59e0b","🦉"] : s.bacDung <= 2 ? ["Leo có điểm tựa","#2563eb","🧗"] : ["Đang tập leo","#0e9f9a","🌱"];
+  const g = s.tuLuc / 100, R = 92, C = 2 * Math.PI * R;
+  return {ten:hang[0], svg:`<svg viewBox="0 0 240 240">
+    <circle cx="120" cy="120" r="${R}" fill="#fff" stroke="#e6ebf5" stroke-width="18"/>
+    <circle cx="120" cy="120" r="${R}" fill="none" stroke="${hang[1]}" stroke-width="18" stroke-linecap="round" stroke-dasharray="${C * g} ${C}" transform="rotate(-90 120 120)"/>
+    <circle cx="120" cy="120" r="70" fill="url(#gVang)" opacity=".25"/>
+    <text x="120" y="112" text-anchor="middle" font-size="44">${hang[2]}</text>
+    <text x="120" y="152" text-anchor="middle" font-size="30" font-weight="900" fill="#14213d">${s.tuLuc}%</text>
+    <text x="120" y="174" text-anchor="middle" font-size="12.5" font-weight="700" fill="#55637d">chữ em tự gõ</text></svg>`};
+}
+function manNop(p){
+  const goi = goiPhien(p), s = soLieu(goi), h = huyChuong(s), bai = timBai(p.bai);
+  const phut = Math.max(1, Math.round((p.dur || 0) / 60));
+  return `
+  <div class="ket">
+    <section class="the huy-chuong hien">${h.svg}<h2 style="margin-top:6px">${h.ten}</h2>
+      <div class="nho">Mã <b>${esc(p.ma)}</b> · Lớp ${bai.lop} · ${esc(MON[bai.mon || "anh"])} · ${esc(bai.unit)}</div></section>
+    <section class="the">
+      <h2>🎉 Em đã tự hoàn thành bài viết!</h2>
+      <div class="o-so">
+        <div><b>${goi.w}</b><span>${dv(bai)} em viết</span></div>
+        <div><b>${phut}′</b><span>thời gian tự viết</span></div>
+        <div><b>${s.bacDung}<span style="font-size:15px">/3</span></b><span>bậc gợi ý đã dùng ${(goi.r).map((x, i) => `<i class="cham" style="background:${x >= 0 ? MAU_BAC_HEX[i + 1] : "#dde3ee"}"></i>`).join("")}</span></div>
+        <div><b>${s.tongDau}→${s.tongCuoi}</b><span>lỗi: lần soi đầu → bài nộp</span></div>
+        <div><b>${goi.pt.length}</b><span>lần định dán (đã chặn)</span></div>
+        <div><b>${esc(goi.so) || "—"}</b><span>cấu trúc trọng tâm đạt</span></div>
+      </div>
+      <h3 style="margin-top:16px">Hôm nay em tự nghĩ ra được nhiều không?</h3>
+      <div class="cam-xuc" id="camXuc">${[["3","😀 Em tự nghĩ được nhiều"],["2","🙂 Cần gợi ý một chút"],["1","😐 Vẫn còn khó"]].map(([k, t]) => `<button data-md="${k}" class="${p.md === k ? "chon" : ""}">${t}</button>`).join("")}</div>
+      <h3 style="margin-top:12px">Em có dùng AI khác (ChatGPT, Gemini…) cho bài này không?</h3>
+      <p class="nho">Nói thật không bị trừ điểm — cô chỉ muốn biết để giúp em đúng cách.</p>
+      <div class="cam-xuc" id="khaiAI">${[["0","Không dùng"],["goi-y","Có — chỉ hỏi gợi ý"],["bai-mau","Có — lấy bài mẫu"]].map(([k, t]) => `<button data-ai="${k}" class="${p.ai === k ? "chon" : ""}">${t}</button>`).join("")}</div>
+      <div class="nho" id="baoAI"></div>
+      <h3 style="margin-top:12px">📨 Mã nộp bài</h3>
+      <p class="nho">Mã chứa bài viết, quá trình viết và các con số trên — <b>không có họ tên</b>. Gửi cho thầy/cô theo cách lớp đã thống nhất.</p>
+      <div class="ma-nop" id="maNop">đang tạo mã…</div>
+      <div class="hang-nut">
+        <button class="nut" id="nChep">📋 Chép mã nộp bài</button>
+        <button class="nut xanh ${coDuongGui() ? "" : "an"}" id="nGui">📨 Nộp thẳng cho cô</button>
+        <a class="nut phu2" href="#viet&bai=${esc(p.bai)}&lai=1">✍️ Viết bài mới</a>
+        <button class="nut phu2" id="nMang">🧳 Mang gia sư theo</button>
+      </div>
+      <div class="nho" id="baoNop" style="margin-top:8px"></div>
+    </section>
+  </div>`;
+}
+async function ganNop(p){
+  const taoMa = async () => { const ma = await maHoa(goiPhien(p)); $("#maNop").textContent = ma; return ma; };
+  let ma = await taoMa();
+  $("#camXuc").onclick = async e => { const b = e.target.closest("[data-md]"); if (!b) return; p.md = b.dataset.md; kho.ghi("phienCuoi", p);
+    document.querySelectorAll("#camXuc button").forEach(x => x.classList.toggle("chon", x === b)); ma = await taoMa(); };
+  $("#khaiAI").onclick = async e => { const b = e.target.closest("[data-ai]"); if (!b) return; p.ai = b.dataset.ai; kho.ghi("phienCuoi", p);
+    document.querySelectorAll("#khaiAI button").forEach(x => x.classList.toggle("chon", x === b)); ma = await taoMa();
+    $("#baoAI").innerHTML = p.ai === "0" ? "👍 Tuyệt vời!" : "Cảm ơn em đã trung thực 🫶 Lần sau dùng AI, em bấm <b>🧳 Mang gia sư theo</b> rồi dán câu lệnh vào trước — AI sẽ hỏi gợi mở thay vì làm hộ."; };
+  $("#nMang").onclick = async () => { $("#baoNop").textContent = (await chep(CAU_LENH_GIA_SU)) ? "✅ Đã chép «câu lệnh gia sư» — dán vào Gemini / ChatGPT trước khi hỏi." : "Không chép được tự động."; };
+  $("#nChep").onclick = async () => { $("#baoNop").textContent = (await chep(ma)) ? "✅ Đã chép. Em dán vào chỗ nộp bài thầy/cô hướng dẫn." : "Máy không cho chép tự động — em giữ ngón tay vào ô mã để chọn và chép."; };
+  $("#nGui").onclick = async () => {
+    const b = $("#nGui"); b.disabled = true; $("#baoNop").textContent = "Đang nộp…";
+    try {
+      const kq = await guiHoacCat("nopBai", [ma, p.ma, p.bai]);
+      if (kq === "cat" && !coAppsScript() && navigator.onLine !== false){ chuyenHang(); $("#baoNop").textContent = "📨 Đang mở trang của cô để nộp — em chờ trang báo «Đã gửi cô» nhé."; }
+      else $("#baoNop").textContent = kq === "cat" ? "📦 Máy đang mất mạng — app đã cất bài của em. Có mạng lại, em mở app và bấm thanh «Có mạng rồi» trên đầu để gửi cô." : "✅ Đã nộp cho cô! Em vẫn nên chép mã để dự phòng.";
+      keu("xong");
+    } catch(err){ b.disabled = false; $("#baoNop").textContent = "Chưa nộp được (" + (err && err.message || "lỗi") + "). Em bấm Chép mã và gửi cho cô nhé."; }
+  };
+  phaoGiay(); keu("xong");
+}
+
+/* ---------- Bàn giáo viên ---------- */
+let DS = [], DSHOI = [], BD = [];   // bài đã giải mã · thắc mắc · lượt mở bài (Google Sheets)
+const boDo = () => { const nop = new Set(DS.map(p => p.ma + "|" + p.bai)); return [...new Set(BD.filter(([m, b]) => !nop.has(m + "|" + b)).map(([m, b]) => m + " · " + (timBai(b).unit || b)))]; };
+const LENH_SOAN_GY = ds => `Bạn là giáo viên THCS ở Việt Nam (Chương trình GDPT 2018, SGK Kết nối tri thức với cuộc sống; Tiếng Anh: Global Success).
+Với MỖI thắc mắc dưới đây của học sinh (chỉ có mã, không có họ tên), viết GỢI Ý gồm 2–3 câu hỏi dẫn dắt để em tự tìm ra — KHÔNG đưa đáp án, KHÔNG giải hộ — kèm dòng "Tra SGK: <môn> <lớp>, bài / chủ đề …". Nếu không chắc bài nào thì ghi "Tra SGK: mục lục, từ khoá …", không đoán. Mỗi gợi ý dưới 70 chữ, đúng trình độ lớp, tiếng Việt có dấu.
+Chỉ trả về JSON: [{"id": số, "goiY": "…"}]
+
+` + ds.map((h, i) => `id ${i}: [${h.ma}] ${h.mon} lớp ${h.lop}: ${h.cau}${h.daNghi ? "\n   (em đã nghĩ: " + h.daNghi + ")" : ""}`).join("\n");
+const LENH_SOAT_GY = ds => `Bạn là người soát chuyên môn THCS. Đọc từng gợi ý dưới đây dành cho học sinh. Đánh dấu ok=false nếu gợi ý: (1) có kiến thức sai hoặc không chắc chắn; (2) lỡ đưa đáp án / lời giải; (3) vượt chương trình lớp đó; (4) không phù hợp lứa tuổi. Nêu ngắn gọn vấn đề.
+Chỉ trả về JSON: [{"id": số, "ok": true/false, "vanDe": "…"}]
+
+` + ds.map((h, i) => `id ${i}: ${h.mon} lớp ${h.lop} — Câu hỏi: ${h.cau}\n   Gợi ý: ${h.goiY || "(trống)"}`).join("\n");
+function veHopHoi(){
+  const o = $("#hopHoi"); if (!o) return;
+  if (!DSHOI.length){ o.innerHTML = `<p class="nho">Chưa có thắc mắc nào. HS gửi từ màn <b>🧭 Hỏi gia sư</b> (nút 📮), thầy/cô tải về hoặc dán mã vào ô trên.</p>`; return; }
+  o.innerHTML = `<div class="hang-nut"><button class="nut cam" id="gySoan">🤖 ① Chép câu lệnh: AI soạn gợi ý</button><button class="nut phu2" id="gySoat">🔎 ② Chép câu lệnh: AI thứ hai soát lại</button></div>
+    <textarea class="dan" id="gyJson" placeholder="Dán JSON AI trả về (bước ① hoặc ②) rồi bấm Đọc"></textarea>
+    <div class="hang-nut"><button class="nut phu2" id="gyDoc">⬇ Đọc JSON</button><button class="nut xanh" id="gyGui">📤 Gửi các gợi ý đã tick duyệt</button></div>
+    <div class="nho" id="gyBao"></div>
+    <div class="hop-hoi">${DSHOI.map((h, i) => `<div class="o ${h.vanDe ? "co-van-de" : ""}"><b>${esc(h.ma)} · ${esc(h.mon)} lớp ${esc(h.lop)}</b> — ${esc(h.cau)}
+      ${h.daNghi ? `<div class="nho">Em đã nghĩ: ${esc(h.daNghi)}</div>` : ""}${h.vanDe ? `<div class="nho" style="color:var(--sai)">⚠ AI soát: ${esc(h.vanDe)}</div>` : ""}
+      <textarea data-gy="${i}" placeholder="Gợi ý gửi em (câu hỏi dẫn dắt + bài SGK)">${esc(h.goiY || "")}</textarea>
+      <label class="nho"><input type="checkbox" data-duyet="${i}" ${h.duyet ? "checked" : ""}> Tôi đã đọc và duyệt</label>${h.traLoi ? ` <span class="nho" style="color:var(--dung)">✔ đã gửi</span>` : ""}</div>`).join("")}</div>`;
+}
+function manGV(mau){
+  return `
+  <section class="the">
+    <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap">
+      <div style="flex:1;min-width:240px"><h2>📊 Bàn giáo viên — bản đồ lỗi & quá trình tự viết của cả lớp</h2>
+      <p class="nho">Dán các mã nộp bài (mỗi mã một dòng) hoặc tải bài đã nộp qua Google Sheets. Mọi việc chạy trên máy thầy/cô.</p></div>
+      ${mau ? `<span class="chip" style="background:#fff3c4;border-color:#f5a524;font-weight:800">DỮ LIỆU THỬ</span>` : ""}
+    </div>
+    <textarea class="dan" id="oDan" placeholder="TGM3z.…"></textarea>
+    <div class="hang-nut">
+      <button class="nut" id="nDoc">📥 Đọc mã</button>
+      <span class="${coMayChu() ? "" : "an"}" style="display:inline-flex;gap:8px;align-items:center"><input id="oPin" type="password" placeholder="Mã GV" style="width:110px;min-height:48px;border-radius:12px;border:1.5px solid var(--vien);padding:8px 10px"><button class="nut xanh" id="nTai">☁ Tải bài đã nộp</button></span>
+      <button class="nut phu2" id="nThu">🧪 Xem dữ liệu thử</button>
+      <button class="nut phu2" id="nCsv">⬇ Xuất CSV</button>
+      <button class="nut phu2" id="nLenh">🤖 Câu lệnh nhận xét cho AI</button>
+      <button class="nut phu2" id="nXoa">🗑 Xoá</button>
+    </div>
+    <div class="nho" id="baoGV" style="margin-top:6px"></div>
+  </section>
+  <div id="bang"></div>
+  <section class="the" style="margin-top:16px"><h2>📮 Hộp thắc mắc mọi môn</h2>
+    <p class="nho">AI soạn nháp gợi ý dạng câu hỏi dẫn dắt + bài SGK → AI thứ hai soát lỗi kiến thức, lỡ đưa đáp án → thầy/cô đọc chỗ máy đánh dấu, tick duyệt → gửi.</p>
+    <div id="hopHoi"></div></section>`;
+}
+function tongHop(){
+  const n = DS.length; if (!n) return null;
+  const s = DS.map(soLieu), tb = a => a.reduce((x, y) => x + y, 0) / n;
+  const loiDau = {}, loiCuoi = {}, bac = [0, 0, 0], md = {1:0, 2:0, 3:0};
+  DS.forEach(p => { const d = p.c && p.c[0] ? p.c[0].n : {}; for (const k in d) loiDau[k] = (loiDau[k] || 0) + d[k]; for (const k in p.l) loiCuoi[k] = (loiCuoi[k] || 0) + p.l[k];
+    (p.r || []).forEach((x, i) => { if (x >= 0) bac[i]++; }); if (p.md) md[p.md]++; });
+  return {n, tbTu:tb(DS.map(p => p.w)), tbTuLuc:tb(s.map(x => x.tuLuc)), tiLeSua:s.filter(x => x.suaDuoc > 0).length / n * 100,
+    tbBac:tb(s.map(x => x.bacDung)), dan:DS.reduce((a, p) => a + (p.pt || []).length, 0), loiDau, loiCuoi, bac, md,
+    cuu:DS.reduce((a, p) => a + (p.cu || 0), 0), da:DS.reduce((a, p) => a + (p.da || 0), 0), khai:DS.filter(p => p.ai && p.ai !== "0").length, coKhai:DS.filter(p => p.ai).length,
+    tongDau:s.reduce((a, x) => a + x.tongDau, 0), tongCuoi:s.reduce((a, x) => a + x.tongCuoi, 0)};
+}
+function bieuLoi(t){
+  const ds = LOI.map(L => L.id).filter(k => t.loiDau[k] || t.loiCuoi[k]).sort((a, b) => (t.loiDau[b] || 0) - (t.loiDau[a] || 0)).slice(0, 7);
+  if (!ds.length) return `<p class="nho">Chưa có lỗi nào được ghi nhận.</p>`;
+  const max = Math.max(1, ...ds.map(k => t.loiDau[k] || 0)), H = 34 * ds.length + 30;
+  return `<svg viewBox="0 0 520 ${H}">` + ds.map((k, i) => {
+    const y = 10 + i * 34, a = (t.loiDau[k] || 0) / max * 250, b = (t.loiCuoi[k] || 0) / max * 250;
+    return `<text x="0" y="${y + 16}" font-size="12.5" fill="#14213d">${esc(TEN_LOI[k].length > 30 ? TEN_LOI[k].slice(0, 29) + "…" : TEN_LOI[k])}</text>
+      <rect x="230" y="${y + 2}" width="${a}" height="12" rx="5" fill="#e5484d" opacity=".85"/><rect x="230" y="${y + 16}" width="${b}" height="12" rx="5" fill="#12a150"/>
+      <text x="${236 + a}" y="${y + 12}" font-size="11" font-weight="800" fill="#e5484d">${t.loiDau[k] || 0}</text><text x="${236 + b}" y="${y + 26}" font-size="11" font-weight="800" fill="#12a150">${t.loiCuoi[k] || 0}</text>`;
+  }).join("") + `</svg><div class="chu-thich"><span><i class="cham" style="background:#e5484d"></i>Lần soi đầu</span><span><i class="cham" style="background:#12a150"></i>Bài nộp (sau khi HS tự sửa)</span></div>`;
+}
+function bieuCot(nhan, so, mau){
+  const max = Math.max(1, ...so), W = 300;
+  return `<svg viewBox="0 0 ${W} 190">` + so.map((v, i) => { const w = (W - 40) / so.length, h = v / max * 120, x = 20 + i * w;
+    return `<rect x="${x + 8}" y="${150 - h}" width="${w - 16}" height="${h}" rx="8" fill="${mau[i]}"/><text x="${x + w / 2}" y="${144 - h}" text-anchor="middle" font-size="15" font-weight="900" fill="#14213d">${v}</text>
+    <text x="${x + w / 2}" y="170" text-anchor="middle" font-size="12" fill="#55637d">${nhan[i]}</text>`; }).join("") + `<path d="M14 150H${W - 14}" stroke="#cfd8e8"/></svg>`;
+}
+function veBang(){
+  const t = tongHop(), o = $("#bang");
+  if (!t){ o.innerHTML = `<div class="the nho" style="margin-top:16px">Chưa có bài nào. Dán mã nộp bài vào ô trên, hoặc bấm 🧪 Xem dữ liệu thử.</div>`; return; }
+  o.innerHTML = `
+  <div class="kpi" style="margin-top:16px">
+    <div><b>${t.n}</b><span>bài đã nộp</span></div>
+    <div><b>${Math.round(t.tbTu)}</b><span>số từ / chữ trung bình</span></div>
+    <div><b>${Math.round(t.tbTuLuc)}%</b><span>chữ HS tự gõ (TB)</span></div>
+    <div><b>${Math.round(t.tiLeSua)}%</b><span>HS tự sửa được ≥ 1 lỗi</span></div>
+    <div><b>${t.tbBac.toFixed(1)}</b><span>bậc gợi ý dùng TB (/3)</span></div>
+    <div><b>${t.dan}</b><span>lần định dán bị chặn</span></div>
+    <div><b>${t.cuu}</b><span>lần bấm Cứu hộ</span></div>
+    <div><b>${t.da}</b><span>lần xem đáp án chuẩn (sau khi tự sửa)</span></div>
+    <div><b>${t.khai}/${t.coKhai}</b><span>HS tự khai có dùng AI khác</span></div>
+    ${BD.length ? `<div><b>${boDo().length}</b><span>mở bài nhưng chưa nộp</span></div>` : ""}
+  </div>
+  ${BD.length && boDo().length ? `<p class="nho" style="margin-top:8px">Mở bài nhưng chưa nộp: ${boDo().map(x => `<span class="chip">${esc(x)}</span>`).join("")} — cô hỏi han các em này nhé.</p>` : ""}
+  <div class="bieu">
+    <div class="the"><h3>🗺 Bản đồ lỗi cả lớp — trước và sau khi tự sửa (${t.tongDau} → ${t.tongCuoi})</h3>${bieuLoi(t)}</div>
+    <div class="the"><h3>📈 Bậc gợi ý được mở</h3>${bieuCot(["Từ ngữ","Khung câu","Mẫu khác"], t.bac, MAU_BAC_HEX.slice(1))}<p class="nho">Nhiều em mở bậc 4 → đề có thể khó, cần dạy mẫu trên lớp.</p></div>
+    <div class="the"><h3>💬 HS tự đánh giá</h3>${bieuCot(["😀 tự nghĩ","🙂 cần gợi ý","😐 còn khó"], [t.md[3], t.md[2], t.md[1]], ["#16a34a","#2563eb","#f59e0b"])}</div>
+  </div>
+  <div class="bang-cuon"><table><thead><tr><th>Mã HS</th><th>Bài</th><th>Từ</th><th>Phút</th><th>Bậc dùng</th><th>Lỗi đầu→nộp</th><th>Định dán</th><th>Tự gõ</th><th>Cảm nhận</th><th></th></tr></thead><tbody>
+  ${DS.map((p, i) => { const s = soLieu(p); return `<tr><td><b>${esc(p.ma)}</b></td><td>${esc(MON[p.mon || "anh"] + " · " + p.bt)}</td><td>${p.w}</td><td>${Math.max(1, Math.round(p.dur / 60))}</td>
+    <td>${(p.r || []).map((x, j) => `<i class="cham" style="background:${x >= 0 ? MAU_BAC_HEX[j + 1] : "#dde3ee"}"></i>`).join("")}</td>
+    <td>${s.tongDau} → <b style="color:${s.tongCuoi < s.tongDau ? "var(--dung)" : "inherit"}">${s.tongCuoi}</b></td><td>${(p.pt || []).length}</td><td>${s.tuLuc}%</td><td>${{3:"😀",2:"🙂",1:"😐"}[p.md] || "—"}</td>
+    <td><button class="nut phu2" style="min-height:36px;padding:4px 12px" data-pl="${i}">▶ Xem quá trình</button></td></tr>`; }).join("")}
+  </tbody></table></div>`;
+}
+async function docMa(chu, them){
+  const ds = chu.split(/\s+/).filter(x => /^TGM3z?\./.test(x)); let loi = 0;
+  const moi = [];
+  for (const m of ds){ try { moi.push(await giaiMa(m)); } catch(e){ loi++; } }
+  const khoaP = p => p.ma + "|" + p.bai + "|" + p.t0;
+  const daCo = new Set(DS.map(khoaP));
+  moi.forEach(p => { if (p.k === "hoi"){ if (!DSHOI.some(h => h.ma === p.ma && h.t0 === p.t0)) DSHOI.push(p); return; } if (!daCo.has(khoaP(p))){ DS.push(p); daCo.add(khoaP(p)); } });
+  if (them) kho.ghi("gv", (kho.doc("gv", [])).concat(ds));
+  return {doc:moi.length, loi};
+}
+function ganGV(mau){
+  $("#nDoc").onclick = async () => { const r = await docMa($("#oDan").value, true); $("#baoGV").textContent = `Đã đọc ${r.doc} mã` + (r.loi ? `, ${r.loi} mã lỗi (bị cắt khi chép?)` : "") + "."; $("#oDan").value = ""; veBang(); veHopHoi(); };
+  $("#nThu").onclick = () => { DS = duLieuThu(); veBang(); $("#baoGV").textContent = "Đang xem DỮ LIỆU THỬ — không phải học sinh thật."; };
+  $("#nXoa").onclick = () => { if (confirm("Xoá các mã đã dán trên máy này?")){ kho.xoa("gv"); DS = []; veBang(); } };
+  $("#nCsv").onclick = () => {
+    const dong = [["ma_hs","bai","so_tu_chu","phut","bac_dung","loi_dau","loi_nop","dinh_dan","tu_go_%","cam_nhan","bai_viet"]].concat(DS.map(p => { const s = soLieu(p);
+      return [p.ma, MON[p.mon || "anh"] + " · " + p.bt, p.w, Math.round(p.dur / 60), s.bacDung, s.tongDau, s.tongCuoi, (p.pt || []).length, s.tuLuc, p.md, p.txt]; }));
+    const csv = "﻿" + dong.map(r => r.map(x => `"${String(x == null ? "" : x).replace(/"/g, '""')}"`).join(",")).join("\r\n");
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"})); a.download = "thang-goi-mo-ket-qua.csv"; a.click();
+  };
+  $("#nLenh").onclick = async () => {
+    const t = tongHop(); if (!t) return;
+    const lenh = `Bạn là giáo viên THCS, dạy đúng môn ghi trong ngoặc của từng bài (Tiếng Anh theo SGK Global Success; các môn khác theo CT GDPT 2018). Dưới đây là bài viết của học sinh, chỉ ghi MÃ, không có họ tên.\nVới MỖI bài: (1) khen 1 điểm cụ thể; (2) chỉ ra tối đa 2 lỗi quan trọng nhất bằng câu hỏi gợi mở, KHÔNG viết lại bài, KHÔNG đưa đáp án; (3) 1 gợi ý nâng cao. Mỗi bài dưới 60 từ, tiếng Việt.\nCuối cùng: 3 lỗi chung của cả lớp và 1 hoạt động 10 phút để dạy lại.\n\n` +
+      DS.map(p => `[${p.ma}] (${MON[p.mon || "anh"]} · ${p.bt})\n${p.txt}`).join("\n\n");
+    $("#baoGV").textContent = (await chep(lenh)) ? "✅ Đã chép câu lệnh (kèm bài viết, chỉ có mã HS). Thầy/cô dán vào Gemini/ChatGPT, đọc lại và chỉnh trước khi gửi HS." : "Không chép được tự động.";
+  };
+  $("#nTai").onclick = () => {
+    $("#baoGV").textContent = "Đang tải…";
+    may("layBaiNop", $("#oPin").value).then(async kq => { kq = Array.isArray(kq) ? {nop:kq} : (kq || {}); const r = await docMa((kq.nop || []).join("\n"), false);
+        BD = kq.batDau || []; (kq.hoi || []).forEach(h => { if (!DSHOI.some(x => x.dong === h.dong)) DSHOI.push(h); });
+        $("#baoGV").textContent = `Đã tải ${r.doc} bài, ${(kq.hoi || []).length} thắc mắc từ Google Sheets.`; veBang(); veHopHoi(); })
+      .catch(e => $("#baoGV").textContent = e && e.matMang ? "📴 Cần có mạng để tải bài từ Google Sheets." : "Không tải được: " + (e && e.message));
+  };
+  $("#bang").addEventListener("click", e => { const b = e.target.closest("[data-pl]"); if (b) phatLai(DS[+b.dataset.pl]); });
+  $("#hopHoi").addEventListener("input", e => { const g = e.target.dataset.gy, d = e.target.dataset.duyet;
+    if (g != null) DSHOI[+g].goiY = e.target.value; if (d != null) DSHOI[+d].duyet = e.target.checked; });
+  $("#hopHoi").addEventListener("click", async e => {
+    if (e.target.id === "gySoan") $("#gyBao").textContent = (await chep(LENH_SOAN_GY(DSHOI))) ? "✅ Đã chép. Dán vào Gemini/ChatGPT, chép JSON trả về vào ô dưới, bấm Đọc." : "Không chép được.";
+    if (e.target.id === "gySoat") $("#gyBao").textContent = (await chep(LENH_SOAT_GY(DSHOI))) ? "✅ Đã chép câu lệnh soát. Nên dán vào MỘT AI KHÁC (VD soạn bằng Gemini thì soát bằng ChatGPT hoặc ngược lại)." : "Không chép được.";
+    if (e.target.id === "gyDoc"){ try { const t = $("#gyJson").value, j = JSON.parse(t.slice(t.indexOf("["), t.lastIndexOf("]") + 1));
+        j.forEach(x => { const h = DSHOI[+x.id]; if (!h) return; if (x.goiY) h.goiY = x.goiY; if ("ok" in x) h.vanDe = x.ok ? "" : (x.vanDe || "cần xem lại"); });
+        veHopHoi(); $("#gyBao").textContent = "✅ Đã đọc. Thầy/cô xem kĩ các ô viền đỏ, sửa rồi tick duyệt."; } catch(err){ $("#gyBao").textContent = "Chưa đọc được JSON — chép đúng phần từ [ đến ]."; } }
+    if (e.target.id === "gyGui"){ const ds = DSHOI.filter(h => h.duyet && h.goiY);
+      if (!ds.length){ $("#gyBao").textContent = "Chưa có gợi ý nào được tick duyệt."; return; }
+      const loiKem = "\n(Gợi ý do AI soạn, cô đã duyệt — em đối chiếu SGK nhé.)";
+      if (coMayChu() && ds.every(h => h.dong)){
+        may("traLoi", $("#oPin").value, ds.map(h => ({dong:h.dong, text:h.goiY + loiKem}))).then(n => { ds.forEach(h => h.traLoi = h.goiY); veHopHoi(); $("#gyBao").textContent = `✅ Đã gửi ${n} gợi ý — HS xem ở «📬 Thư của cô».`; })
+          .catch(err => $("#gyBao").textContent = "Chưa gửi được: " + (err && err.message));
+      } else { await chep(ds.map(h => `[${h.ma}] ${h.mon}: ${h.cau}\n→ ${h.goiY}${loiKem}`).join("\n\n")); ds.forEach(h => h.traLoi = h.goiY); veHopHoi(); $("#gyBao").textContent = "✅ Đã chép các gợi ý (kèm mã HS) — dán gửi các em qua Zalo lớp hoặc đọc trên lớp."; }
+    }
+  });
+  veHopHoi();
+  if (mau){ DS = duLieuThu(); DSHOI = hoiThu(); BD = [["8A-13","g8u1"],["8A-14","g8u1"],["8A-02","g8u1"]]; veHopHoi(); }
+  else if (!DS.length){ const cu = kho.doc("gv", []); if (cu.length) return docMa(cu.join("\n"), false).then(() => { veBang(); veHopHoi(); }); }
+  veBang();
+}
+function phatLai(p){
+  const khung = dungLai(p.tl || []), dur = Math.max(1, p.dur || (khung.length ? khung[khung.length - 1][0] : 1));
+  const sk = [];
+  (p.r || []).forEach((x, i) => { if (x >= 0) sk.push([x, MAU_BAC_HEX[i + 1], "Mở bậc " + (i + 2)]); });
+  (p.c || []).forEach(c => sk.push([c.t, "#14213d", "Tự soi bản nháp"]));
+  (p.pt || []).forEach(x => sk.push([x, "#e5484d", "Định dán (bị chặn)"]));
+  $("#che").innerHTML = `<div class="man-che" id="mc"><div class="hop hien">
+    <div style="display:flex;align-items:center;gap:10px"><h2 style="flex:1">▶ Quá trình tự viết — ${esc(p.ma)} · ${esc(p.bt)}</h2><button class="nut phu2" id="dong">✕</button></div>
+    <p class="nho">Xem lại từng bước em viết: chữ xanh là phần mới thêm. Đây là bằng chứng bài viết do chính HS tạo ra — dùng để <b>trò chuyện</b> với em, không để bắt lỗi.</p>
+    <div class="truc"><input type="range" id="tr" min="0" max="${khung.length ? khung.length - 1 : 0}" value="${khung.length ? khung.length - 1 : 0}"></div>
+    <div class="su-kien">${sk.map(([t, m, n]) => `<i title="${esc(n)} · ${Math.round(t / 60)}′" style="left:${t / dur * 100}%;background:${m}"></i>`).join("")}</div>
+    <div class="chu-thich"><span><i class="cham" style="background:#2563eb"></i>Mở bậc gợi ý</span><span><i class="cham" style="background:#14213d"></i>Tự soi</span><span><i class="cham" style="background:#e5484d"></i>Định dán</span><span id="dongHo"></span></div>
+    <div class="van-ban-pl" id="vb" style="margin-top:10px"></div>
+    <div class="hang-nut"><button class="nut" id="chay">▶ Phát lại</button></div></div></div>`;
+  const ve = i => { if (!khung.length) return; const [t, chu] = khung[i], cu = i ? khung[i - 1][1] : "", [pp, , them] = khacBiet(cu, chu);
+    $("#vb").innerHTML = esc(chu.slice(0, pp)) + "<ins>" + esc(them) + "</ins>" + esc(chu.slice(pp + them.length));
+    $("#dongHo").textContent = `⏱ ${Math.floor(t / 60)}′${String(t % 60).padStart(2, "0")} · ${dem(chu)} từ`; };
+  const tr = $("#tr"); tr.oninput = () => ve(+tr.value); ve(+tr.value);
+  let h = null;
+  $("#chay").onclick = () => { clearInterval(h); tr.value = 0; ve(0); h = setInterval(() => { if (+tr.value >= +tr.max) return clearInterval(h); tr.value = +tr.value + 1; ve(+tr.value); }, 380); };
+  const dong = () => { clearInterval(h); $("#che").innerHTML = ""; };
+  $("#dong").onclick = dong; $("#mc").onclick = e => { if (e.target.id === "mc") dong(); };
+}
+function duLieuThu(){
+  const r = ngauNhien(2026), ds = [];
+  const cau = ["In my leisure time, I usually hang out with my friends.","I adore playing badminton in the yard.","I also like reading comics at weekends.","However, I don't like surfing the net for too long because it hurts my eyes.","Sometimes I help my mother cook dinner.","Leisure activities help me relax after school."];
+  const sai = ["i very like play football.","My brother like watching TV.","I am enjoy to cook with my mum.","there have a big park near my house."];
+  for (let i = 0; i < 12; i++){
+    const so = 3 + Math.floor(r() * 4), tl = []; let chu = "", t = 0;
+    const cauBai = [sai[i % sai.length]].concat(Array.from({length:so}, (_, k) => cau[(i + k) % cau.length]));
+    for (const c of cauBai){ const moi = chu + (chu ? " " : "") + c; tl.push([t += 40 + Math.floor(r() * 90)].concat(khacBiet(chu, moi))); chu = moi; }
+    const tdau = {}, tcuoi = {};
+    const ns = Math.floor(r() * 4); ["vl","s3","et","th","li","lb"].slice(0, ns + 1).forEach(k => tdau[k] = 1 + Math.floor(r() * 2));
+    if (r() < .3) tcuoi.s3 = 1;
+    if (r() < .2) tcuoi.li = 1;
+    const ruBac = [r() < .55 ? 60 + Math.floor(r() * 120) : -1, r() < .35 ? 200 : -1, r() < .12 ? 320 : -1];
+    if (ruBac[0] < 0) ruBac[1] = ruBac[2] = -1;
+    if (ruBac[1] < 0) ruBac[2] = -1;
+    const cu = r() < .3 ? 1 : 0, da = cu || r() < .35 ? 1 + Math.floor(r() * 2) : 0, ai = ["0","0","0","goi-y","0","bai-mau"][Math.floor(r() * 6)];
+    ds.push({cu, da, ai, v:3, ma:"8A-" + String(i + 1).padStart(2, "0"), bai:"g8u1", bt:"Unit 1 · Leisure Time", lop:8, t0:Date.UTC(2026, 9, 20, 2, i), dur:t + 120, w:dem(chu), txt:chu,
+      ty:92 + Math.floor(r() * 8), pt:r() < .4 ? [15 + Math.floor(r() * 40)] : [], r:ruBac, c:[{t:t - 60, n:tdau, w:dem(chu)}], l:tcuoi, so:"2/3", md:String(1 + Math.floor(r() * 3)), tl});
+  }
+  return ds;
+}
+
+/* ---------- Soạn thang (giáo viên) ---------- */
+function lenhAI(d){
+  const anh = d.mon === "anh", tk = (d.tuKhoa || []).join("; ");
+  const ct = d.ct.filter(([k]) => !k.startsWith("tk:")).map(([k]) => CAU_TRUC[k] ? CAU_TRUC[k].nhan : k).join("; ");
+  if (anh) return `Bạn là chuyên gia dạy viết tiếng Anh THCS theo SGK Tiếng Anh Global Success (Việt Nam).
+Hãy soạn THANG GỢI MỞ 4 bậc cho đề viết dưới đây. TUYỆT ĐỐI KHÔNG viết bài mẫu cho chính đề này.
+- Lớp: ${d.lop} · ${d.unit}
+- Đề: ${d.de}
+- Độ dài: ${d.tu[0]}–${d.tu[1]} từ
+- Cấu trúc trọng tâm: ${ct || "(tuỳ đề)"}
+Chỉ trả về JSON đúng mẫu, không thêm chữ nào khác:
+{"cauHoi":"1 câu hỏi gợi mở bằng tiếng Việt, dưới 40 từ, giúp HS nhớ lại trải nghiệm thật",
+ "chon":["5 ý tưởng ngắn bằng tiếng Anh để HS chọn"],
+ "tuNgu":["12 từ/cụm từ tiếng Anh dạng: word – nghĩa tiếng Việt"],
+ "khung":["5 khung câu tiếng Anh, chỗ trống ghi …"],
+ "mau":"đoạn mẫu 50–70 từ về MỘT CHỦ ĐỀ KHÁC nhưng dùng cùng cấu trúc, để HS học cách sắp xếp mà không chép được"}
+Quy tắc: từ vựng trong phạm vi lớp ${d.lop}; không nêu tên người thật; tiếng Việt có dấu.`;
+  return `Bạn là giáo viên ${MON[d.mon] || "THCS"} lớp ${d.lop}, dạy theo Chương trình GDPT 2018.
+Hãy soạn THANG GỢI MỞ 4 bậc giúp học sinh TỰ VIẾT bài dưới đây. TUYỆT ĐỐI KHÔNG viết bài mẫu cho chính đề này, không đưa đáp án.
+- Bài / chủ đề: ${d.unit}
+- Đề: ${d.de}
+- Độ dài: ${d.tu[0]}–${d.tu[1]} chữ
+- Yêu cầu trình bày: ${ct || "(tuỳ đề)"}${tk ? "\n- Từ khoá giáo viên muốn có: " + tk : ""}
+Chỉ trả về JSON đúng mẫu, không thêm chữ nào khác:
+{"cauHoi":"1 câu hỏi gợi mở, dưới 40 chữ, giúp HS liên hệ hiểu biết hoặc trải nghiệm thật",
+ "chon":["4–5 hướng ý ngắn để HS chọn một"],
+ "tuNgu":["12 từ ngữ / khái niệm hữu ích, dạng: từ – giải thích ngắn"],
+ "khung":["5 câu mở đầu còn dở dang, chỗ trống ghi …"],
+ "tuKhoa":["4–6 từ khoá trọng tâm bài cần có"],
+ "mau":"đoạn mẫu 60–90 chữ về MỘT CHỦ ĐỀ KHÁC nhưng cùng kiểu bài, để HS học cách sắp xếp ý mà không chép được"}
+Quy tắc: kiến thức đúng chương trình lớp ${d.lop}, không đưa kiến thức lớp trên; không nêu tên người thật; tiếng Việt có dấu.`;
+}
+function oCauTruc(mon, chon){
+  const anh = mon === "anh";
+  return Object.entries(CAU_TRUC).filter(([, c]) => !!c.vi !== anh)
+    .map(([k, c]) => `<label><input type="checkbox" value="${k}" ${chon.some(x => x[0] === k) ? "checked" : ""}> ${esc(c.nhan)}</label>`).join("");
+}
+function manSoan(mau){
+  const d = mau ? Object.assign({}, BAI_GOC.find(b => b.id === "v9nl"), {id:""}) : {mon:"anh", lop:7, unit:"", de:"", deVi:"", tu:[60,80], mo:[0,10,25,40], ct:[["vthich",2]], cauHoi:"", chon:[], tuNgu:[], khung:[], mau:""};
+  d.mon = d.mon || "anh";
+  const tuKhoa = d.ct.filter(([k]) => k.startsWith("tk:")).map(([k]) => k.slice(3));
+  return `
+  <div class="soan">
+    <section class="the">
+      <h2>✍️ Soạn thang gợi mở cho một đề viết</h2>
+      <p class="nho">Dùng cho <b>mọi môn</b>. AI soạn nháp — <b>thầy/cô đọc, sửa và duyệt</b> — rồi mới giao cho học sinh. HS không bao giờ chat tự do với AI.</p>
+      <div style="display:grid;grid-template-columns:1.4fr 1fr;gap:10px">
+        <div><label>Môn</label><select id="sMon">${Object.entries(MON).map(([k, t]) => `<option value="${k}" ${d.mon === k ? "selected" : ""}>${esc(t)}</option>`).join("")}</select></div>
+        <div><label>Lớp</label><select id="sLop">${[6,7,8,9].map(l => `<option ${+d.lop === l ? "selected" : ""}>${l}</option>`).join("")}</select></div>
+      </div>
+      <label>Bài / Unit / chủ đề (theo SGK)</label><input id="sUnit" value="${esc(d.unit)}" placeholder="VD: Unit 2 · Healthy Living / Viết · Nghị luận xã hội">
+      <label id="nhanDe">Đề bài</label><input id="sDe" value="${esc(d.de)}">
+      <label>Ghi chú / đề bằng tiếng Việt (tuỳ chọn)</label><input id="sDeVi" value="${esc(d.deVi)}">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label id="nhanMin">Ít nhất</label><input id="sMin" type="number" value="${d.tu[0]}"></div><div><label id="nhanMax">Nhiều nhất</label><input id="sMax" type="number" value="${d.tu[1]}"></div></div>
+      <label>Yêu cầu máy tự đếm</label>
+      <div class="cot-chuan" id="oCT">${oCauTruc(d.mon, d.ct)}</div>
+      <div id="oTK"><label>Từ khoá trọng tâm (mỗi dòng 1 từ / cụm — máy đếm có hay chưa)</label><textarea id="sTK" placeholder="nhân hoá&#10;biện pháp tu từ">${esc(tuKhoa.join("\n"))}</textarea></div>
+      <h3 style="margin-top:14px">① Chép câu lệnh → dán vào Gemini / ChatGPT</h3>
+      <div class="lenh" id="lenh"></div>
+      <div class="hang-nut"><button class="nut cam" id="nChepLenh">📋 Chép câu lệnh cho AI</button></div>
+      <h3 style="margin-top:14px">② Dán kết quả AI trả về (JSON)</h3>
+      <textarea class="dan" id="sJson" placeholder='{"cauHoi": "...", ...}'></textarea>
+      <div class="hang-nut"><button class="nut phu2" id="nDua">⬇ Đưa vào 4 bậc</button></div>
+      <div class="nho" id="baoSoan"></div>
+    </section>
+    <section class="the">
+      <h2>③ Đọc – sửa – duyệt 4 bậc</h2>
+      ${[["sHoi","1 · Ý tưởng — câu hỏi gợi mở", d.cauHoi], ["sChon","1 · Ý tưởng để chọn (mỗi dòng 1 ý)", d.chon.join("\n")], ["sTu","2 · Từ ngữ (mỗi dòng: từ – nghĩa / giải thích)", d.tuNgu.join("\n")], ["sKhung","3 · Khung câu (mỗi dòng 1 khung)", d.khung.join("\n")], ["sMau","4 · Bài mẫu — CHỦ ĐỀ KHÁC", d.mau]]
+        .map(([id, nhan, v], i) => `<label style="color:${MAU_BAC_HEX[Math.max(0, i - 1)]}">${nhan}</label><textarea id="${id}">${esc(v)}</textarea>`).join("")}
+      <label class="duyet"><input type="checkbox" id="sDuyet" ${mau ? "checked" : ""}> Tôi đã đọc, sửa và duyệt nội dung (đúng SGK, đúng trình độ, không có bài mẫu của chính đề)</label>
+      <div class="hang-nut"><button class="nut xanh" id="nLuu">💾 Lưu & tạo link cho học sinh</button></div>
+      <div id="link" class="nho" style="margin-top:8px"></div>
+      <h3 style="margin-top:14px">Bài thầy/cô đã soạn trên máy này</h3>
+      <div id="dsRieng" class="nho"></div>
+    </section>
+  </div>`;
+}
+function ganSoan(){
+  const dong = id => $(id).value.split("\n").map(x => x.trim()).filter(Boolean);
+  const doc = () => { const mon = $("#sMon").value, tk = dong("#sTK");
+    return {mon, lop:+$("#sLop").value, unit:$("#sUnit").value.trim() || "Bài của thầy/cô", de:$("#sDe").value.trim(), deVi:$("#sDeVi").value.trim(), tuKhoa:tk,
+      tu:[+$("#sMin").value || 40, +$("#sMax").value || 80],
+      ct:[...document.querySelectorAll("#oCT input:checked")].map(x => [x.value, ["tuNoi","vthich","viNoi"].includes(x.value) ? 2 : 1]).concat(mon === "anh" ? [] : tk.slice(0, 6).map(t => ["tk:" + t, 1]))}; };
+  const theoMon = () => { const anh = $("#sMon").value === "anh", donVi = anh ? "từ" : "chữ";
+    $("#oTK").classList.toggle("an", anh); $("#nhanDe").textContent = anh ? "Đề bài (tiếng Anh)" : "Đề bài";
+    $("#sDe").placeholder = anh ? "Write a paragraph (60–80 words) about…" : "Viết đoạn văn (150–200 chữ) …";
+    $("#nhanMin").textContent = "Ít nhất (" + donVi + ")"; $("#nhanMax").textContent = "Nhiều nhất (" + donVi + ")"; };
+  const lenh = () => $("#lenh").textContent = lenhAI(doc());
+  $("#sMon").addEventListener("change", () => { const cu = doc(); $("#oCT").innerHTML = oCauTruc(cu.mon, []); theoMon(); lenh(); });
+  document.querySelector(".soan").addEventListener("input", lenh); theoMon(); lenh();
+  $("#nChepLenh").onclick = async () => $("#baoSoan").textContent = (await chep($("#lenh").textContent)) ? "✅ Đã chép. Dán vào Gemini/ChatGPT, chép phần JSON trả về vào ô ②." : "Không chép được tự động — bôi đen khung tối rồi chép.";
+  $("#nDua").onclick = () => {
+    try { const s = $("#sJson").value, j = JSON.parse(s.slice(s.indexOf("{"), s.lastIndexOf("}") + 1));
+      $("#sHoi").value = j.cauHoi || ""; $("#sChon").value = (j.chon || []).join("\n"); $("#sTu").value = (j.tuNgu || []).join("\n"); $("#sKhung").value = (j.khung || []).join("\n"); $("#sMau").value = j.mau || "";
+      if (j.tuKhoa && j.tuKhoa.length && $("#sMon").value !== "anh") $("#sTK").value = j.tuKhoa.join("\n");
+      lenh(); $("#baoSoan").textContent = "✅ Đã đưa vào 4 bậc. Thầy/cô đọc kĩ từng bậc bên phải trước khi duyệt."; }
+    catch(e){ $("#baoSoan").textContent = "Chưa đọc được JSON — thầy/cô chép đúng phần từ { đến }."; }
+  };
+  $("#nLuu").onclick = async () => {
+    if (!$("#sDuyet").checked){ $("#link").innerHTML = "<b style='color:var(--sai)'>Thầy/cô cần đọc và tick «đã duyệt» trước khi giao cho HS.</b>"; return; }
+    const d = doc(); delete d.tuKhoa;
+    if (!d.de || !$("#sHoi").value.trim()){ $("#link").textContent = "Cần có đề bài và câu hỏi gợi mở."; return; }
+    const w = d.tu[0];
+    const bai = Object.assign(d, {id:"r" + nay().toString(36), hinh:d.mon === "van" ? "nghiluan" : "rieng", rieng:true, mo:[0, Math.round(w * .15), Math.round(w * .4), Math.round(w * .65)],
+      cauHoi:$("#sHoi").value.trim(), chon:dong("#sChon"), tuNgu:dong("#sTu"), khung:dong("#sKhung"), mau:$("#sMau").value.trim()});
+    kho.ghi("bai", baiRieng().concat([bai]));
+    const u = location.href.split("#")[0] + "#bai-moi=" + b64(new TextEncoder().encode(JSON.stringify(bai)));
+    $("#link").innerHTML = `✅ Đã lưu. Link giao bài (HS mở là có đề):<div class="ma-nop" style="margin-top:6px">${esc(u)}</div>`;
+    await chep(u); veRieng();
+  };
+  const veRieng = () => { const ds = baiRieng(); $("#dsRieng").innerHTML = ds.length ? ds.map(b => `• Lớp ${b.lop} · ${esc(MON[b.mon || "anh"])} · ${esc(b.unit)} — ${esc(b.de)}`).join("<br>") : "Chưa có."; };
+  veRieng();
+}
+
+/* =====================================================================
+   8. ĐÁP ÁN CHUẨN TIẾNG ANH — sinh theo luật cố định, chỉ cho đúng các lỗi máy bắt
+      (động từ nằm trong danh sách đóng) → luôn đúng, không cần duyệt.
+   ===================================================================== */
+const S3 = {like:"likes",go:"goes",play:"plays",watch:"watches",have:"has",do:"does",live:"lives",want:"wants",read:"reads",love:"loves",enjoy:"enjoys",work:"works",study:"studies",help:"helps",visit:"visits",need:"needs",get:"gets",make:"makes",grow:"grows",teach:"teaches"};
+const ING = {play:"playing",read:"reading",watch:"watching",go:"going",listen:"listening",cook:"cooking",swim:"swimming",ride:"riding",draw:"drawing",collect:"collecting",do:"doing",make:"making",grow:"growing",help:"helping",sing:"singing",dance:"dancing",surf:"surfing",hang:"hanging",visit:"visiting",walk:"walking",study:"studying",learn:"learning",fish:"fishing",garden:"gardening",write:"writing",sit:"sitting",run:"running",get:"getting",take:"taking",have:"having",come:"coming",eat:"eating",talk:"talking",chat:"chatting",shop:"shopping",travel:"travelling",stay:"staying",spend:"spending",use:"using",live:"living",see:"seeing",work:"working",love:"loving",agree:"agreeing",want:"wanting",need:"needing",like:"liking",enjoy:"enjoying",paint:"painting",jog:"jogging",skip:"skipping",plan:"planning",stop:"stopping",cycle:"cycling",bake:"baking",climb:"climbing"};
+function veIng(v){
+  v = v.toLowerCase();
+  if (ING[v]) return ING[v];
+  if (/ie$/.test(v)) return v.slice(0, -2) + "ying";
+  if (/[^aeiou]e$/.test(v) && !/(ee|ye|oe)$/.test(v)) return v.slice(0, -1) + "ing";
+  if (v.length <= 4 && /[^aeiou][aeiou][^aeiouwxy]$/.test(v)) return null;   // có thể phải gấp đôi phụ âm → không đoán
+  return v + "ing";
+}
+const giuHoa = (mau, chu) => mau[0] === mau[0].toUpperCase() ? chu[0].toUpperCase() + chu.slice(1) : chu;
+const VIET_TAT = {ko:"không",k:"không",kh:"không",hok:"không",dc:"được","đc":"được",j:"gì",vs:"với",ntn:"như thế nào",mn:"mọi người",bn:"bạn (hoặc: bao nhiêu)",cx:"cũng",nx:"nữa (hoặc: nhận xét)",trc:"trước",ng:"người",r:"rồi",z:"vậy"};
+const LY_DO = {
+  vl:"“very” không đứng trước động từ. Dùng “really + động từ” hoặc đặt “very much” ở cuối câu.",
+  be:"Câu đã có động từ chính thì không thêm am/is/are; nếu muốn dùng am/is/are thì động từ phải ở dạng V-ing.",
+  s3:"Hiện tại đơn: chủ ngữ là he/she/it hoặc một người, một vật → động từ thêm -s/-es.",
+  lb:"Sau like/love/enjoy/hate/prefer… hoạt động ở dạng V-ing (like, love, hate, prefer còn dùng được to V).",
+  et:"enjoy, adore, fancy, detest, mind chỉ đi với V-ing, không đi với to V.",
+  th:"Nói “có cái gì ở đâu” dùng There is (số ít) / There are (số nhiều).",
+  mb:"Câu với tính từ cần động từ to be: I am, he/she/it is, we/they are.",
+  pp:"“people” là danh từ số nhiều.",
+  dc:"Tính từ đã thêm -er là so sánh hơn rồi, không thêm “more”.",
+  li:"“I” (tôi) luôn viết hoa.", sc:"Chữ cái đầu câu luôn viết hoa.", hv:"Chữ cái đầu câu luôn viết hoa.",
+  ne:"Câu kết thúc bằng dấu chấm (hoặc ! ?).", tn:"Bài viết ở trường không dùng chữ viết tắt kiểu tin nhắn."
+};
+function dapAn(id, s){
+  const w = s.trim().split(/\s+/), cuoi = w[w.length - 1].toLowerCase();
+  switch (id){
+    case "vl": return s.replace(/very\s+/i, "really ") + "  (hoặc: … " + w[w.length - 1].replace(/s$/, "") + " … very much)";
+    case "be": { const v = cuoi, be = w[0].toLowerCase(), tinh = ["like","love","want","need","agree"].includes(v);
+      const bo = be === "is" ? (S3[v] || v + "s") : v; const ing = veIng(v);
+      return tinh || !ing ? bo : bo + "  (hoặc: " + be + " " + ing + ")"; }
+    case "s3": return w.slice(0, -1).join(" ") + " " + (S3[cuoi] || cuoi + "s");
+    case "lb": { const ing = veIng(cuoi); return ing ? w.slice(0, -1).join(" ") + " " + ing : null; }
+    case "et": { const ing = veIng(cuoi); return ing ? w[0] + " " + ing : w[0] + " + V-ing"; }
+    case "th": return giuHoa(s, "there is") + " (số ít) / " + giuHoa(s, "there are") + " (số nhiều)";
+    case "mb": { const cn = w[0].toLowerCase(), be = cn === "i" ? "am" : (["we","they"].includes(cn) ? "are" : "is"); return w[0] + " " + be + " " + w.slice(1).join(" "); }
+    case "pp": { const d = {is:"are",was:"were",has:"have",likes:"like",lives:"live",works:"work"}; return w[0] + " " + (d[cuoi] || cuoi); }
+    case "dc": return w.slice(1).join(" ");
+    case "li": return "I";
+    case "sc": case "hv": return s.toUpperCase();
+    case "ne": return s + ".";
+    case "tn": return VIET_TAT[s.toLowerCase()] || null;
+    default: return null;
+  }
+}
+
+/* =====================================================================
+   9. HỎI GIA SƯ — mọi môn THCS (trọng tâm lớp 7–8). Gia sư dạy CÁCH NGHĨ và chỉ về SGK,
+      không tự đưa kiến thức, không giải hộ → không cần giáo viên bộ môn duyệt.
+   ===================================================================== */
+const MON_HOI = {toan:"Toán", van:"Ngữ văn", anh:"Tiếng Anh", khtn:"KHTN", su:"Lịch sử", dia:"Địa lí", gdcd:"GDCD", cn:"Công nghệ", tin:"Tin học", gdtc:"Giáo dục thể chất", nhac:"Âm nhạc", mt:"Mĩ thuật", hdtn:"HĐTN – Hướng nghiệp", dp:"GD địa phương"};
+const B = (h, nho) => ({h, nho});
+const PP = {
+  "tinh-toan":{ten:"Bài tính toán", buoc:[B("Đề cho biết những gì? Em liệt kê các số, các dữ kiện.","Gạch chân mọi con số và đơn vị trong đề."),
+    B("Đề hỏi gì? Em viết lại câu hỏi bằng lời của mình.","Câu hỏi thường nằm ở câu cuối của đề."),
+    B("Kiến thức nào liên quan (công thức, quy tắc, tính chất)? Em tra SGK ở bài có từ khoá bên dưới.","Từ toán học trong đề (diện tích, tỉ lệ, trung bình…) chính là chìa khoá tìm bài."),
+    B("Lập kế hoạch: bước nào làm trước, bước nào làm sau?","Viết 2–3 bước bằng chữ trước, chưa cần tính."),
+    B("Làm xong, kiểm tra lại: thay kết quả vào đề có hợp lí không? Đơn vị đã đúng chưa?","Thử ước lượng: kết quả to hay nhỏ có hợp lí với đề không?")]},
+  "chung-minh":{ten:"Bài chứng minh", buoc:[B("Giả thiết là gì? Kết luận cần chứng minh là gì? Vẽ hình (nếu là hình học).","Kẻ đường gạch ngang: trên là giả thiết, dưới là kết luận."),
+    B("Muốn có kết luận đó, em cần chứng minh điều gì trước? (đi ngược từ kết luận)","Hỏi: “Để có … thì cần có gì?”"),
+    B("Định lí, tính chất nào trong SGK có kết luận giống thế?","Lật lại các khung “Định lí”, “Tính chất” trong bài đang học."),
+    B("Sắp các ý thành chuỗi: Vì … nên …","Mỗi dòng một lí do."),
+    B("Đọc lại: bước nào cũng có lí do chưa?","Bước nào thiếu “vì” thì đó là chỗ cần xem lại.")]},
+  "khai-niem":{ten:"Câu hỏi khái niệm", buoc:[B("Em đã nghe khái niệm này ở đâu? Nêu một ví dụ em biết.","Ví dụ ngoài đời cũng được."),
+    B("Tìm định nghĩa trong SGK (từ khoá bên dưới), rồi viết lại bằng lời của em.","Định nghĩa thường in đậm hoặc trong khung."),
+    B("Tìm 1 ví dụ ĐÚNG và 1 ví dụ KHÔNG ĐÚNG với khái niệm.","Ví dụ sai giúp em hiểu ranh giới của khái niệm."),
+    B("Giải thích khái niệm cho một bạn lớp dưới trong 1–2 câu.","Nếu bạn ấy hiểu được, là em đã hiểu.")]},
+  "giai-thich":{ten:"Câu hỏi “vì sao”", buoc:[B("Hiện tượng / sự việc là gì? Mô tả điều em thấy.","Ai, cái gì, thay đổi thế nào?"),
+    B("Em đã gặp điều này ở đâu ngoài đời?","Ở nhà, ở trường, trên đồng ruộng…"),
+    B("Đoán nguyên nhân: có thể do những yếu tố nào?","Liệt kê 2 khả năng, chưa cần biết đúng sai."),
+    B("Kiểm chứng: tra SGK (từ khoá bên dưới) — ý nào khớp với dự đoán của em?","Đọc phần giải thích, gạch chân câu có “vì”, “do”, “nên”."),
+    B("Tự giải thích lại bằng một câu: Vì … nên …","Không chép SGK, nói bằng lời của em.")]},
+  "thi-nghiem":{ten:"Thí nghiệm, thực hành", buoc:[B("Thí nghiệm nhằm tìm hiểu điều gì?",""),
+    B("Cần những dụng cụ, vật liệu nào?",""),
+    B("Các bước làm theo thứ tự?","Đánh số từng bước."),
+    B("Em dự đoán kết quả ra sao? Vì sao?","Dự đoán trước rồi mới xem SGK."),
+    B("Cần chú ý an toàn gì? ⚠ Chỉ làm khi có thầy cô hoặc người lớn hướng dẫn.","")]},
+  "su-kien":{ten:"Sự kiện lịch sử", buoc:[B("Sự kiện diễn ra khi nào?","Tìm mốc năm trong SGK."), B("Ở đâu?",""), B("Những ai, lực lượng nào tham gia?",""),
+    B("Diễn ra thế nào: mở đầu – diễn biến chính – kết thúc?","Vẽ một mũi tên thời gian 3 mốc."), B("Kết quả và ý nghĩa là gì?","")]},
+  "giai-thich-su":{ten:"Nguyên nhân lịch sử", buoc:[B("Sự kiện là gì?",""), B("Bối cảnh lúc đó ra sao (đất nước, thế giới)?",""),
+    B("Nguyên nhân bên trong và bên ngoài?","Kẻ 2 cột: bên trong / bên ngoài."), B("Tra SGK (từ khoá bên dưới) để kiểm chứng.",""), B("Viết lại: Vì … nên …","")]},
+  "y-nghia":{ten:"Ý nghĩa, bài học", buoc:[B("Sự kiện / nhân vật đã thay đổi điều gì?",""), B("Với đất nước, người dân lúc đó ra sao?",""), B("Bài học cho hôm nay và cho em là gì?","")]},
+  "so-sanh":{ten:"So sánh", buoc:[B("So sánh hai đối tượng nào?",""), B("Chọn tiêu chí so sánh (thời gian, vị trí, đặc điểm, kết quả…).","Chọn 3 tiêu chí."),
+    B("Giống nhau ở đâu?",""), B("Khác nhau ở đâu?",""), B("Kẻ bảng 2 cột rồi rút ra một câu kết luận.","")]},
+  "vi-tri":{ten:"Vị trí địa lí", buoc:[B("Thuộc châu lục, khu vực nào?",""), B("Tiếp giáp với những gì (biển, nước, vùng…)?",""),
+    B("Mở bản đồ trong SGK, tìm đúng đối tượng.","Xem chú giải bản đồ trước."), B("Vị trí đó ảnh hưởng gì đến tự nhiên, đời sống?","")]},
+  "dac-diem":{ten:"Đặc điểm địa lí", buoc:[B("Đối tượng là gì (khí hậu, địa hình, sông ngòi, dân cư, kinh tế…)?",""),
+    B("Tra SGK, tìm các đặc điểm chính (từ khoá bên dưới).","Thường có 3–4 ý."), B("Vì sao có đặc điểm đó?",""), B("Ảnh hưởng đến đời sống, sản xuất thế nào?","")]},
+  "tinh-huong":{ten:"Tình huống ứng xử", buoc:[B("Trong tình huống có ai, đã làm gì?",""),
+    B("Việc làm đó đúng hay chưa đúng với chuẩn mực nào? Tra SGK (từ khoá bên dưới).",""),
+    B("Hậu quả với bản thân, với người khác?",""), B("Nếu là em, em sẽ làm gì? Vì sao?","Nêu 2 cách rồi chọn cách tốt hơn.")]},
+  "quy-trinh":{ten:"Quy trình kĩ thuật", buoc:[B("Sản phẩm / thiết bị là gì, dùng để làm gì?",""), B("Gồm những bộ phận nào?",""),
+    B("Quy trình gồm những bước nào?",""), B("Cần chú ý an toàn gì?",""), B("Ở nhà em có thiết bị / việc làm tương tự không?","")]},
+  "lap-trinh":{ten:"Bài tin học", buoc:[B("Em muốn máy làm gì? Đầu vào là gì, kết quả mong muốn là gì?",""),
+    B("Chia nhỏ việc đó thành các bước.","Viết bằng tiếng Việt trước, chưa cần viết lệnh."), B("Thử từng bước, quan sát kết quả hoặc thông báo lỗi.","Đọc kĩ dòng thông báo lỗi."),
+    B("Tra SGK Tin học (từ khoá bên dưới).",""), B("Sửa và chạy lại. Kết quả đã đúng mong muốn chưa?","")]},
+  "van-dong":{ten:"Động tác thể chất", buoc:[B("Động tác / kĩ thuật gì? Mục đích là gì?",""), B("Chia động tác thành các cử động nhỏ.",""),
+    B("⚠ Khởi động kĩ. Tập chậm từng cử động; chỉ tập nội dung khó khi có thầy cô hoặc người lớn bên cạnh.",""), B("Tự đánh giá: cử động nào chưa được? Lần sau em tập thế nào?","")]},
+  "am-nhac":{ten:"Âm nhạc", buoc:[B("Bài hát / tác phẩm nào, của ai?",""), B("Tính chất, nhịp, tiết tấu em nghe thấy thế nào?",""),
+    B("Hát hoặc gõ tiết tấu thử từng câu.",""), B("Bài gợi cho em cảm xúc gì? Tra SGK Âm nhạc (từ khoá bên dưới).","")]},
+  "my-thuat":{ten:"Mĩ thuật", buoc:[B("Chủ đề là gì, em muốn thể hiện điều gì?",""), B("Chọn bố cục, màu sắc, đường nét.",""),
+    B("Phác thảo nháp.",""), B("Tự nhận xét: em thích chỗ nào, muốn sửa chỗ nào?","")]},
+  "trai-nghiem":{ten:"Trải nghiệm, hướng nghiệp", buoc:[B("Chủ đề / tình huống là gì?",""), B("Em đã trải nghiệm điều gì liên quan?",""),
+    B("Có những lựa chọn nào? Ưu, nhược điểm của từng lựa chọn?",""), B("Kế hoạch hành động của em: làm gì, khi nào, ai hỗ trợ?","")]},
+  "dia-phuong":{ten:"Giáo dục địa phương", buoc:[B("Ở quê em (Ninh Bình, xã em) có điều gì liên quan?",""), B("Hỏi người lớn hoặc tra tài liệu địa phương.",""),
+    B("Điều đó có ý nghĩa gì với quê hương?",""), B("Em có thể làm gì để giữ gìn, phát huy?","")]},
+  "doc-hieu":{ten:"Đọc hiểu văn bản", buoc:[B("Văn bản gì, của ai, thể loại gì?",""), B("Câu hỏi hỏi về nội dung hay nghệ thuật?",""),
+    B("Tìm chi tiết, câu văn làm bằng chứng.","Gạch chân trong văn bản."), B("Nêu ý của em, kèm bằng chứng.","Nếu là bài viết, em sang Thang Gợi Mở để luyện viết.")]},
+  "ngu-phap":{ten:"Tiếng Anh: từ, ngữ pháp", buoc:[B("Em hỏi về từ, cấu trúc hay cách dùng? Viết lại câu ví dụ em gặp.",""),
+    B("Tra SGK Global Success, Unit có từ khoá bên dưới, phần Grammar / Vocabulary.",""), B("Đặt 2 câu của riêng em dùng từ / cấu trúc đó.",""),
+    B("Sang Thang Gợi Mở viết đoạn ngắn và bấm Tự soi để kiểm.","")]}
+};
+function loaiCau(mon, c){
+  c = c.toLowerCase();
+  const co = re => re.test(c);
+  if (co(/so sánh|giống|khác nhau/)) return "so-sanh";
+  if (mon === "toan"){ if (co(/chứng minh|cmr/)) return "chung-minh"; if (co(/là gì|định nghĩa|khái niệm/)) return "khai-niem"; return "tinh-toan"; }
+  if (mon === "khtn"){ if (co(/thí nghiệm|làm thế nào|cách làm/)) return "thi-nghiem"; if (co(/tính|bao nhiêu|\d/)) return "tinh-toan"; if (co(/là gì|khái niệm|định nghĩa/)) return "khai-niem"; return "giai-thich"; }
+  if (mon === "su"){ if (co(/vì sao|tại sao|nguyên nhân/)) return "giai-thich-su"; if (co(/ý nghĩa|bài học/)) return "y-nghia"; return "su-kien"; }
+  if (mon === "dia"){ if (co(/ở đâu|vị trí|nằm|tiếp giáp/)) return "vi-tri"; if (co(/vì sao|tại sao/)) return "giai-thich"; return "dac-diem"; }
+  if (mon === "gdcd"){ if (co(/là gì|khái niệm/)) return "khai-niem"; return "tinh-huong"; }
+  if (mon === "cn") return co(/là gì/) ? "khai-niem" : "quy-trinh";
+  if (mon === "tin") return co(/là gì|khái niệm/) ? "khai-niem" : "lap-trinh";
+  if (mon === "gdtc") return "van-dong";
+  if (mon === "nhac") return "am-nhac";
+  if (mon === "mt") return "my-thuat";
+  if (mon === "hdtn") return co(/là gì/) ? "khai-niem" : "trai-nghiem";
+  if (mon === "dp") return "dia-phuong";
+  if (mon === "van") return co(/là gì|khái niệm|biện pháp/) ? "khai-niem" : "doc-hieu";
+  if (mon === "anh") return "ngu-phap";
+  return co(/vì sao|tại sao/) ? "giai-thich" : "khai-niem";
+}
+const DUNG_HOI = new Set("em mình tôi tớ cho hỏi là gì sao tại vì thế nào như của các những và có không được một cái này đó bài câu hãy giúp với làm cách tính tìm giải thích khi ở đâu ai bao nhiêu nhé ạ ơi thì mà để trong ra vậy nên phải cần muốn biết hiểu cô thầy bạn ơi đã sẽ đang rồi nữa chứ hả hở hay hoặc từ đến lớp sgk bị sai chỗ hiểu làm mãi không ra dùng nào".split(" "));
+function tuKhoaHoi(c){
+  const tu = (c.toLowerCase().match(/[a-zà-ỹđ0-9]+/gi) || []);
+  const cum = []; let ht = [];
+  for (const t of tu){ if (DUNG_HOI.has(t) || /^\d+$/.test(t)) { if (ht.length) cum.push(ht.join(" ")); ht = []; } else ht.push(t); }
+  if (ht.length) cum.push(ht.join(" "));
+  return [...new Set(cum)].sort((a, b) => b.split(" ").length - a.split(" ").length).slice(0, 3);
+}
+const CANH_BAO_AN_TOAN = /(tự tử|muốn chết|tự làm đau|rạch tay|bị đánh|bị bạo hành|xâm hại|bị bắt nạt|bị đe doạ|bị đe dọa)/i;
+const CAU_LENH_GIA_SU = `Bạn là gia sư riêng cho học sinh THCS ở Việt Nam (lớp 7–8). Quy tắc bắt buộc:
+1) KHÔNG đưa đáp án, lời giải hay bài làm hoàn chỉnh, kể cả khi tôi xin nhiều lần.
+2) Mỗi lượt chỉ hỏi tôi MỘT câu gợi mở, dưới 50 từ, thân thiện.
+3) Khi tôi trả lời, khen điểm đúng rồi hỏi bước tiếp theo. Nếu tôi bí 2 lần, cho tôi một ví dụ TƯƠNG TỰ đã đổi số / đổi chủ đề.
+4) Bám sách giáo khoa Kết nối tri thức với cuộc sống (Tiếng Anh: Global Success). Không chắc thì nói “em kiểm tra lại SGK”, không đoán.
+5) Tôi tự viết câu trả lời cuối cùng; bạn chỉ nhận xét.
+Câu hỏi của tôi là: `;
+
+let H = null;   // phiên hỏi gia sư
+function manHoi(mau){
+  const lop = kho.doc("lopHoi", 7), mon = kho.doc("monHoi", "toan");
+  return `
+  <div class="hoi">
+    <section class="the">
+      <h2>🧭 Hỏi gia sư — mọi môn THCS</h2>
+      <p class="nho">Gia sư <b>không giải hộ</b>: cùng em tìm <b>cách nghĩ</b> từng bước, rồi chỉ em mở đúng chỗ trong SGK. Trọng tâm lớp 7–8.</p>
+      <label class="nho" style="display:block;margin-top:10px"><b>Môn</b></label>
+      <div id="hMon">${Object.entries(MON_HOI).map(([k, t]) => `<span class="chip ${k === mon ? "chon" : ""}" data-mh="${k}">${esc(t)}</span>`).join("")}</div>
+      <label class="nho" style="display:block;margin-top:8px"><b>Lớp</b></label>
+      <div id="hLop">${[6,7,8,9].map(l => `<span class="chip ${l === +lop ? "chon" : ""}" data-lh="${l}">Lớp ${l}</span>`).join("")}</div>
+      <textarea class="o-go" id="hCau" style="min-height:110px" placeholder="Em đang thắc mắc điều gì? Gõ câu hỏi hoặc chép lại đề bài…"></textarea>
+      <div class="hang-nut">
+        <button class="nut" id="hBatDau">🧭 Cùng gia sư tìm cách</button>
+        <button class="nut phu2" id="hMang">🧳 Mang gia sư theo</button>
+        <button class="nut phu2 ${coMayChu() ? "" : "an"}" id="hThu">📬 Thư của cô</button>
+      </div>
+      <div class="nho" id="hBao" style="margin-top:6px"></div>
+      <div id="hThuDs"></div>
+    </section>
+    <section class="the" id="hBuoc">
+      <div class="cu-hang"><svg class="cu" viewBox="0 0 100 104"><use href="#cu"/></svg>
+        <div class="loi-cu" id="loiCu">Chào em! Em chọn môn, gõ câu hỏi rồi bấm <b>Cùng gia sư tìm cách</b>. Mình sẽ đi từng bước — em tự nghĩ, cô Cú chỉ đường.</div></div>
+      <div id="hDs"></div>
+    </section>
+  </div>`;
+}
+function veHoi(){
+  const pp = PP[H.loai], dau = H.buoc.length;
+  const tk = tuKhoaHoi(H.cau);
+  let s = `<div class="nho" style="margin:12px 0 4px"><b>${esc(MON_HOI[H.mon])} · lớp ${H.lop}</b> · kiểu câu hỏi: <b>${esc(pp.ten)}</b></div>
+    <div class="guong" style="line-height:1.6">${esc(H.cau)}</div>`;
+  pp.buoc.forEach((b, i) => {
+    const mo = i <= dau, xong = i < dau;
+    s += `<div class="bac ${mo ? "" : "khoa"}" style="margin-top:10px">
+      <div class="bac-dau"><span class="bac-so" style="background:${MAU_BAC_HEX[i % 4]}">${i + 1}</span><span class="bac-ten">${esc(b.h)}</span><span class="bac-tt">${xong ? "✅" : mo ? "✍️" : "🔒"}</span></div>
+      ${mo ? `<div class="bac-than">${xong ? `<div class="khung-cau" style="font-family:inherit">${esc(H.buoc[i])}</div>`
+        : `<textarea class="dan" id="hTra" style="min-height:70px;font-family:inherit;font-size:16px" placeholder="Em nghĩ… (vài chữ cũng được)"></textarea>
+           <div class="hang-nut"><button class="nut" id="hTiep">Bước tiếp ➜</button>${b.nho ? `<button class="nut phu2" id="hNho">💡 Gợi ý nhỏ</button>` : ""}</div>
+           <div class="nho" id="hNhoChu"></div>`}</div>` : ""}</div>`;
+  });
+  if (dau >= pp.buoc.length){
+    s += `<div class="bac" style="margin-top:12px;border-color:#a7e8c1"><div class="bac-than" style="padding-top:12px">
+      <b>🏁 Bây giờ em tự trả lời câu hỏi ban đầu bằng 1–2 câu:</b>
+      <textarea class="dan" id="hKet" style="min-height:70px;font-family:inherit;font-size:16px">${esc(H.ket || "")}</textarea>
+      ${tk.length ? `<p class="nho" style="margin-top:6px">🔎 Gợi ý từ khoá tra SGK ${esc(MON_HOI[H.mon])} lớp ${H.lop}: ${tk.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</p>` : ""}
+      <p class="nho">Gia sư không khẳng định kiến thức — em <b>đối chiếu SGK</b> để chắc chắn nhé.</p>
+      <div class="hang-nut"><button class="nut xanh" id="hXong">✅ Em tự giải được rồi</button><button class="nut cam" id="hGui">📮 Vẫn bí — gửi cô</button></div>
+    </div></div>`;
+  } else if (tk.length) s += `<p class="nho" style="margin-top:10px">🔎 Gợi ý từ khoá tra SGK: ${tk.map(t => `<span class="chip">${esc(t)}</span>`).join("")}</p>`;
+  $("#hDs").innerHTML = s;
+  const tr = $("#hTra"); if (tr && !document.body.classList.contains("tat-hieu-ung")) tr.focus();
+}
+function ganHoi(){
+  $("#hMon").onclick = e => { const c = e.target.closest("[data-mh]"); if (!c) return; kho.ghi("monHoi", c.dataset.mh); document.querySelectorAll("[data-mh]").forEach(x => x.classList.toggle("chon", x === c)); };
+  $("#hLop").onclick = e => { const c = e.target.closest("[data-lh]"); if (!c) return; kho.ghi("lopHoi", +c.dataset.lh); document.querySelectorAll("[data-lh]").forEach(x => x.classList.toggle("chon", x === c)); };
+  $("#hMang").onclick = async () => { $("#hBao").textContent = (await chep(CAU_LENH_GIA_SU + ($("#hCau").value || ""))) ? "✅ Đã chép «câu lệnh gia sư». Nếu em dùng Gemini / ChatGPT, dán câu lệnh này vào trước — AI sẽ hỏi gợi mở thay vì làm hộ." : "Không chép được tự động."; };
+  $("#hThu").onclick = () => { const ma = kho.doc("ma", ""); if (!ma){ $("#hBao").textContent = "Em nhập mã ở trang Luyện viết trước nhé."; return; }
+    may("layTraLoi", ma).then(ds => { $("#hThuDs").innerHTML = (ds && ds.length) ? ds.map(([c, t]) => `<div class="loi khong-loi" style="margin-top:8px"><div><b>${esc(c)}</b>${esc(t)}<div class="nho">Gợi ý do AI soạn, cô đã duyệt — em đối chiếu SGK nhé.</div></div></div>`).join("") : `<p class="nho">Chưa có thư mới.</p>`; })
+      .catch(e => $("#hBao").textContent = e && e.matMang ? "📴 Em cần có mạng để xem thư của cô." : "Chưa tải được: " + (e && e.message)); };
+  $("#hBatDau").onclick = () => {
+    const cau = $("#hCau").value.trim();
+    if (CANH_BAO_AN_TOAN.test(cau)){ mascot("Cô rất lo cho em. 🫶 Em hãy <b>nói ngay với thầy cô, bố mẹ</b> hoặc người lớn em tin tưởng, hoặc gọi <b>Tổng đài 111</b> (bảo vệ trẻ em, miễn phí). Em không phải chịu một mình."); return; }
+    if (dem(cau) < 3){ mascot("Em gõ rõ hơn một chút nhé: em đang hỏi về bài nào, chỗ nào em chưa hiểu?", "nghi"); return; }
+    const mon = kho.doc("monHoi", "toan"), lop = kho.doc("lopHoi", 7);
+    H = {t0:nay(), mon, lop, cau, loai:loaiCau(mon, cau), buoc:[], nho:0, ket:""};
+    keu("mo"); veHoi(); mascot(`Mình đi từng bước nhé! Bước 1: <b>${esc(PP[H.loai].buoc[0].h)}</b>`, "nghi");
+  };
+  $("#hDs").addEventListener("click", async e => {
+    if (e.target.id === "hNho"){ H.nho++; $("#hNhoChu").textContent = "💡 " + PP[H.loai].buoc[H.buoc.length].nho; }
+    if (e.target.id === "hTiep"){
+      const t = $("#hTra").value.trim();
+      if (dem(t) < 2){ keu("chan"); mascot("Viết trước, gợi sau nhé 🙂 Em ghi <b>vài chữ</b> ý của mình — đúng sai chưa quan trọng.", "nghi"); return; }
+      if (/(chán|khó quá|không biết|ko biết|k biết|bỏ cuộc|nản)/i.test(t)){ mascot("Bí là bình thường! Em bấm <b>💡 Gợi ý nhỏ</b>, hoặc ghi điều em ĐÃ biết, dù rất nhỏ.", "nghi"); return; }
+      H.buoc.push(t); keu("ting"); veHoi();
+      const pp = PP[H.loai];
+      mascot(H.buoc.length < pp.buoc.length ? `Tốt lắm! Bước ${H.buoc.length + 1}: <b>${esc(pp.buoc[H.buoc.length].h)}</b>` : "Em đã đi hết các bước! Giờ em <b>tự trả lời</b> câu hỏi ban đầu bằng 1–2 câu nhé.");
+    }
+    if (e.target.id === "hXong" || e.target.id === "hGui"){
+      H.ket = $("#hKet").value.trim();
+      const ls = kho.doc("hoi", []); ls.push(Object.assign({}, H, {tuGiai:e.target.id === "hXong"})); kho.ghi("hoi", ls.slice(-50));
+      if (e.target.id === "hXong"){ if (dem(H.ket) < 3){ mascot("Em viết câu trả lời của mình vào ô trên trước nhé — 1–2 câu thôi.", "nghi"); return; } phaoGiay(); keu("xong"); mascot("Tuyệt vời! Em đã <b>tự</b> tìm ra cách. Nhớ đối chiếu SGK một lần nữa nhé. 🦉"); return; }
+      const ma = kho.doc("ma", "") || "?";
+      const daNghi = H.buoc.map((b, i) => (i + 1) + ". " + b).join(" | ") + (H.ket ? " | Em trả lời: " + H.ket : "");
+      if (coDuongGui()){
+        guiHoacCat("guiThacMac", [ma, MON_HOI[H.mon], H.lop, H.cau, daNghi])
+          .then(kq => kq === "cat" && !coAppsScript() && navigator.onLine !== false ? (chuyenHang(), mascot("📨 Đang mở trang của cô để gửi câu hỏi.")) : mascot(kq === "cat" ? "📦 Máy đang mất mạng — app đã cất câu hỏi. Có mạng lại em bấm thanh «Có mạng rồi» trên đầu để gửi cô." : "📮 Đã gửi cô! Ngày mai em bấm <b>📬 Thư của cô</b> để xem gợi ý nhé."))
+          .catch(err => mascot("Chưa gửi được (" + esc(err && err.message) + "). Em hỏi cô trên lớp nhé.", "nghi"));
+      } else {
+        const m = await maHoa({v:3, k:"hoi", ma, mon:MON_HOI[H.mon], lop:H.lop, cau:H.cau, daNghi, t0:H.t0});
+        await chep(m); mascot("📮 Đã chép <b>mã thắc mắc</b> — em gửi cho cô theo cách lớp đã thống nhất (Zalo, Google Form…).");
+      }
+    }
+  });
+}
+
+/* =====================================================================
+   7. ĐIỀU HƯỚNG + CHẾ ĐỘ CHỤP
+   ===================================================================== */
+function phienMau(bai, buoc){
+  const chu = {g8u1:"In my leisure time, i usually hang out with my friends in the park. I very like play badminton with them. My brother like watching cartoons, but I prefer reading comics. I am enjoy to help my mother cook dinner at weekends",
+               g7u1:"My hobby is drawing. I started it when I was seven years old. I usually draw pictures of my village in my free time. I enjoy drawing because it is relaxing",
+               v9nl:"Hiện nay nhiều học sinh dùng AI để làm bài tập. Theo em việc này vừa có lợi vừa có hại. Trước hết, AI giúp em hiểu bài nhanh hơn khi em bí. Tuy nhiên nhiều bạn chép nguyên văn bài AI viết mà ko đọc lại. khi kiểm tra trên lớp các bạn ấy không viết được. Vì vậy em nghĩ AI chỉ nên là người gợi ý",
+               g6u1:"My school is in Hung Tien. There are twelve classrooms in my school. I like my school because my teachers are friendly."}[bai.id] || "I live in a small village. People here usually grow rice.";
+  const p = {khoa:"mau", cuu:[], da:0, ai:"", bai:bai.id, ma:"8A-12", t0:nay() - 1260000, chu:"", go:0, dan:[95], bac:[0, 140, buoc > 1 ? 520 : -1, -1], kiem:[], tl:[], tlCuoi:"", tlT:0, md:"", xong:false};
+  const tu = chu.split(" ");
+  for (let i = 1; i <= tu.length; i += 3){ const moi = tu.slice(0, i).join(" "); p.tl.push([i * 20].concat(khacBiet(p.tlCuoi, moi))); p.tlCuoi = moi; }
+  p.chu = chu; p.go = chu.length; p.tl.push([tu.length * 20].concat(khacBiet(p.tlCuoi, chu))); p.tlCuoi = chu;
+  return p;
+}
+function dieuHuong(){
+  const h = decodeURIComponent(location.hash.slice(1));
+  if (h.startsWith("bai-moi=")){
+    try { const bai = JSON.parse(new TextDecoder().decode(tuB64(h.slice(8))));
+      if (bai && bai.id && bai.de && Array.isArray(bai.tu)){ bai.rieng = true; kho.ghi("bai", baiRieng().filter(b => b.id !== bai.id).concat([bai])); lopChon = +bai.lop; kho.ghi("lop", lopChon); } } catch(e){}
+    location.replace("#trang-chu"); return;
+  }
+  const [man, ...ts] = h.split("&"), q = Object.fromEntries(ts.map(x => x.split("="))), mau = q.mau === "1";
+  const o = $("#man"), ten = man || "trang-chu";
+  document.body.classList.toggle("tat-hieu-ung", mau || q.chup === "1");
+  document.querySelectorAll("nav a").forEach(a => a.classList.toggle("dang", a.dataset.man === ({viet:"trang-chu", kiem:"trang-chu", nop:"trang-chu", "phat-lai":"gv"}[ten] || ten)));
+  const rb = document.querySelector(".ruy-bang"); if (rb) rb.remove();
+  if (mau){ const d = document.createElement("div"); d.className = "ruy-bang"; d.textContent = "DỮ LIỆU THỬ"; document.body.appendChild(d); }
+  $("#che").innerHTML = "";
+  clearInterval(dongHoCuu); document.body.classList.remove("chi-soi");
+  window.scrollTo(0, 0);
+  if (ten === "viet" || ten === "kiem"){
+    const bai = timBai(q.bai), ma = kho.doc("ma", "");
+    if (!mau && !ma){ location.hash = "trang-chu"; setTimeout(() => { const b = $("#baoMa"); if (b){ b.innerHTML = "<b style='color:var(--sai)'>Em nhập mã trước nhé.</b>"; $("#oMa").focus(); } }, 50); return; }
+    P = mau ? phienMau(bai, ten === "kiem" ? 2 : 1) : moiPhien(bai, ma);
+    if (q.lai === "1" && !mau){ kho.xoa("nhap_" + bai.id + "_" + ma); P = moiPhien(bai, ma); }
+    o.innerHTML = manViet(bai, ten); veBac(bai); capNhatViet(bai);
+    if (!mau) ganViet(bai); else { $("#oGo").value = P.chu;
+      $("#oSoi").addEventListener("click", e => { const b = e.target.closest("[data-da]"); if (b){ const d = $("#da-" + b.dataset.da); if (d) d.classList.remove("an"); } }); }
+    mascot(P.chu ? `Chào em! Em đang viết dở <b>${dem(P.chu)} ${dv(bai)}</b>. Đọc lại câu cuối — ý tiếp theo em muốn kể là gì?` : `Chào em! ${esc(bai.cauHoi)}`);
+    if (q.cuu === "1") P.cuu = [600];
+    if (ten === "kiem") soi(bai);
+    if (q.cuu === "1"){ document.querySelectorAll("[data-da]").forEach(b => b.click()); $("#nCuu").classList.remove("an"); if (mau) document.body.classList.add("chi-soi"); }
+    else if (mau){ mascot(`Giỏi quá — em đã <b>tự viết ${dem(P.chu)} ${dv(bai)}</b>! Bậc 3 · Khung câu vừa mở khoá. Em muốn tự viết tiếp hay mở xem?`); }
+    return;
+  }
+  if (ten === "nop"){
+    let p = mau ? Object.assign(phienMau(BAI_GOC[2], 2), {dur:1260, md:"3", so:"3/3", cuoi:{li:0}}) : kho.doc("phienCuoi", null);
+    if (mau){ const kq = chanDoan(p.chu, BAI_GOC[2]); p.kiem = [{t:900, n:kq.dem, w:kq.w}]; p.cuoi = {s3:1}; }
+    if (!p){ location.hash = "trang-chu"; return; }
+    o.innerHTML = manNop(p); ganNop(p); return;
+  }
+  if (ten === "gv" || ten === "phat-lai"){ o.innerHTML = manGV(mau || ten === "phat-lai"); ganGV(mau || ten === "phat-lai"); if (ten === "phat-lai") phatLai(DS[2]); return; }
+  if (ten === "soan"){ o.innerHTML = manSoan(mau); ganSoan(); return; }
+  if (ten === "hoi"){ o.innerHTML = manHoi(mau); ganHoi();
+    if (mau){ $("#hCau").value = "Tìm x biết 3x + 5 = 20, em làm mãi không ra"; H = {t0:nay(), mon:"toan", lop:7, cau:$("#hCau").value, loai:"tinh-toan", buoc:["Đề cho: 3x + 5 = 20", "Hỏi: tìm x"], nho:0, ket:""};
+      veHoi(); $("#hTra").value = "Chắc là quy tắc chuyển vế, bài phương trình"; mascot(`Tốt lắm! Bước 3: <b>${esc(PP["tinh-toan"].buoc[2].h)}</b>`); }
+    return; }
+  if (q.lop) lopChon = +q.lop;
+  o.innerHTML = manTrangChu();
+  $("#oMa").addEventListener("input", e => { const v = e.target.value.toUpperCase().replace(/[^0-9A-Z\-]/g, ""); e.target.value = v; kho.ghi("ma", v);
+    $("#baoMa").innerHTML = /^[0-9]{1,2}[A-Z][0-9A-Z]?-[0-9]{1,2}$/.test(v) ? "✅ Mã hợp lệ" : "Dạng: lớp-số thứ tự (8A-12)"; });
+  const lm = document.querySelector(".loc-mon");
+  if (lm) lm.onclick = e => { const c = e.target.closest("[data-mon]"); if (c){ monChon = c.dataset.mon; kho.ghi("mon", monChon); dieuHuong(); } };
+  document.querySelector(".tab-lop").onclick = e => { const b = e.target.closest("[data-lop]"); if (b){ lopChon = +b.dataset.lop; kho.ghi("lop", lopChon); dieuHuong(); } };
+  document.querySelector(".ds-bai").onclick = e => { const b = e.target.closest("[data-bai]"); if (!b) return;
+    if (!kho.doc("ma", "")){ $("#baoMa").innerHTML = "<b style='color:var(--sai)'>Em nhập mã trước nhé (VD 8A-12).</b>"; $("#oMa").focus(); return; }
+    location.hash = "viet&bai=" + b.dataset.bai; };
+}
+window.addEventListener("hashchange", dieuHuong);
+if (coAppsScript() && google.script.url) google.script.url.getLocation(l => {
+  const h = l && l.hash || "";
+  if (h.startsWith("guiCo=")) nhanHang(h.slice(6));
+  else if (h && h !== location.hash.slice(1)) location.hash = h;
+});
+dieuHuong();
+baoMang(); guiHang();
+document.addEventListener("click", e => { if (e.target.id === "nCai" && loiMoiCai){ loiMoiCai.prompt(); loiMoiCai = null; e.target.classList.add("an"); } });
+</script>
+</body>
+</html>

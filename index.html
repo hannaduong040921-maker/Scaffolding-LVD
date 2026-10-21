@@ -1041,7 +1041,7 @@ async function ganNop(p){
 }
 
 /* ---------- Bàn giáo viên ---------- */
-let DS = [], DSHOI = [], BD = [];   // bài đã giải mã · thắc mắc · lượt mở bài (Google Sheets)
+let DS = [], DSHOI = [], BD = [], LA_THU = false;   /* LA_THU: Bàn GV đang hiện dữ liệu thử — không trộn với bài thật, không xuất CSV */   // bài đã giải mã · thắc mắc · lượt mở bài (Google Sheets)
 const boDo = () => { const nop = new Set(DS.map(p => p.ma + "|" + p.bai)); return [...new Set(BD.filter(([m, b]) => !nop.has(m + "|" + b)).map(([m, b]) => m + " · " + (timBai(b).unit || b)))]; };
 const LENH_SOAN_GY = ds => `Bạn là giáo viên THCS ở Việt Nam (Chương trình GDPT 2018, SGK Kết nối tri thức với cuộc sống; Tiếng Anh: Global Success).
 Với MỖI thắc mắc dưới đây của học sinh (chỉ có mã, không có họ tên), viết GỢI Ý gồm 2–3 câu hỏi dẫn dắt để em tự tìm ra — KHÔNG đưa đáp án, KHÔNG giải hộ — kèm dòng "Tra SGK: <môn> <lớp>, bài / chủ đề …". Nếu không chắc bài nào thì ghi "Tra SGK: mục lục, từ khoá …", không đoán. Mỗi gợi ý dưới 70 chữ, đúng trình độ lớp, tiếng Việt có dấu.
@@ -1156,14 +1156,16 @@ async function docMa(chu, them){
   return {doc:moi.length, loi};
 }
 function ganGV(mau){
-  $("#nDoc").onclick = async () => { const r = await docMa($("#oDan").value, true); $("#baoGV").textContent = `Đã đọc ${r.doc} mã` + (r.loi ? `, ${r.loi} mã lỗi (bị cắt khi chép?)` : "") + "."; $("#oDan").value = ""; veBang(); veHopHoi(); };
-  $("#nThu").onclick = () => { DS = duLieuThu(); veBang(); $("#baoGV").textContent = "Đang xem DỮ LIỆU THỬ — không phải học sinh thật."; };
-  $("#nXoa").onclick = () => { if (confirm("Xoá các mã đã dán trên máy này?")){ kho.xoa("gv"); DS = []; veBang(); } };
+  $("#nDoc").onclick = async () => { if (LA_THU){ DS = []; LA_THU = false; } const r = await docMa($("#oDan").value, true); $("#baoGV").textContent = `Đã đọc ${r.doc} mã` + (r.loi ? `, ${r.loi} mã lỗi (bị cắt khi chép?)` : "") + "."; $("#oDan").value = ""; veBang(); veHopHoi(); };
+  $("#nThu").onclick = () => { DS = duLieuThu(); LA_THU = true; veBang(); $("#baoGV").innerHTML = "<b style='color:var(--sai)'>Đang xem DỮ LIỆU THỬ (mã 8A-01…8A-12) — không phải học sinh thật, không xuất CSV được.</b> Bấm ☁ Tải bài đã nộp để xem bài thật."; };
+  $("#nXoa").onclick = () => { if (confirm("Xoá các mã đã dán trên máy này?")){ kho.xoa("gv"); DS = []; LA_THU = false; veBang(); } };
   $("#nCsv").onclick = () => {
+    if (LA_THU){ $("#baoGV").innerHTML = "<b style='color:var(--sai)'>⚠️ Bàn GV đang hiện DỮ LIỆU THỬ nên chưa xuất CSV.</b> Bấm ☁ Tải bài đã nộp (bài thật) rồi xuất lại."; return; }
+    if (!DS.length){ $("#baoGV").textContent = "Chưa có bài nào để xuất — bấm ☁ Tải bài đã nộp trước."; return; }
     const dong = [["ma_hs","bai","so_tu_chu","phut","bac_dung","loi_dau","loi_nop","dinh_dan","tu_go_%","cam_nhan","bai_viet"]].concat(DS.map(p => { const s = soLieu(p);
       return [p.ma, MON[p.mon || "anh"] + " · " + p.bt, p.w, Math.round(p.dur / 60), s.bacDung, s.tongDau, s.tongCuoi, (p.pt || []).length, s.tuLuc, p.md, p.txt]; }));
     const csv = "﻿" + dong.map(r => r.map(x => `"${String(x == null ? "" : x).replace(/"/g, '""')}"`).join(",")).join("\r\n");
-    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"})); a.download = "thang-goi-mo-ket-qua.csv"; a.click();
+    const a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], {type:"text/csv"})); a.download = "thang-goi-mo-ket-qua-" + new Date().toISOString().slice(0, 10) + "-" + DS.length + "-bai.csv"; a.click();
   };
   $("#nLenh").onclick = async () => {
     const t = tongHop(); if (!t) return;
@@ -1173,7 +1175,7 @@ function ganGV(mau){
   };
   $("#nTai").onclick = () => {
     $("#baoGV").textContent = "Đang tải…";
-    may("layBaiNop", $("#oPin").value).then(async kq => { kq = Array.isArray(kq) ? {nop:kq} : (kq || {}); const r = await docMa((kq.nop || []).join("\n"), false);
+    may("layBaiNop", $("#oPin").value).then(async kq => { kq = Array.isArray(kq) ? {nop:kq} : (kq || {}); if (LA_THU){ DS = []; LA_THU = false; } const r = await docMa((kq.nop || []).join("\n"), false);
         BD = kq.batDau || []; (kq.hoi || []).forEach(h => { if (!DSHOI.some(x => x.dong === h.dong)) DSHOI.push(h); });
         $("#baoGV").textContent = `Đã tải ${r.doc} bài, ${(kq.hoi || []).length} thắc mắc từ Google Sheets.`; veBang(); veHopHoi(); })
       .catch(e => $("#baoGV").textContent = e && e.matMang ? "📴 Cần có mạng để tải bài từ Google Sheets." : "Không tải được: " + (e && e.message));

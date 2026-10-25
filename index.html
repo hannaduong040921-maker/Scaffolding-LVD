@@ -222,6 +222,31 @@ textarea.dan{width:100%;min-height:90px;border-radius:12px;border:1.5px solid va
   textarea.o-go{font-size:17px;min-height:190px}
   .hang-nut .nut{flex:1}
 }
+/* ---------- Ôn bài theo thang ---------- */
+a.nut{text-decoration:none}
+.cua-on{display:flex;align-items:center;gap:16px;margin:12px 0 4px;padding:16px 20px;border-radius:20px;text-decoration:none;color:var(--chu);background:linear-gradient(135deg,#e6fbf4,#e9f0ff);border:2px solid var(--b1);box-shadow:var(--bong);transition:transform .15s}
+.cua-on:hover{transform:translateY(-3px)}
+.cua-on b{font-size:20px} .cua-on span span{font-size:15px;color:var(--nhat)}
+@media (max-width:560px){.cua-on{flex-wrap:wrap;padding:14px}.cua-on b{font-size:19px}.cua-on .cua-hoi-mui{margin-left:0}}
+.on-tien{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+.on-tien i{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:13px;font-style:normal;font-weight:800;background:#fff;border:2px solid var(--khoa);color:var(--nhat)}
+.on-tien i.dang{border-color:var(--chinh);color:var(--chinh);box-shadow:0 0 0 3px rgba(36,87,214,.18)}
+.on-tien i.tu{background:var(--dung);border-color:var(--dung);color:#fff}
+.on-tien i.goi{background:var(--vang);border-color:var(--vang);color:#fff}
+.on-tien i.cuu{background:var(--cam);border-color:var(--cam);color:#fff}
+.on-cau{font-size:19px;font-weight:700;line-height:1.55;margin:10px 0}
+.on-cho{display:inline-block;min-width:96px;border-bottom:3px solid var(--chinh);margin:0 4px;transform:translateY(3px)}
+.on-chon{display:grid;gap:10px;margin:12px 0}
+.on-chon button{text-align:left;padding:12px 14px;border-radius:14px;background:#fff;border:1.5px solid var(--vien);font-weight:600;min-height:48px}
+.on-chon button:not(:disabled):hover{border-color:var(--chinh);background:#f3f7ff}
+.on-chon button.thu{opacity:.5;text-decoration:line-through}
+.on-chon button.loai{opacity:.35;text-decoration:line-through;background:#f1f3f8}
+.on-chon button.dung{border-color:var(--dung);background:#e8f8ee;opacity:1;text-decoration:none}
+.on-dien{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+.on-dien input{flex:1;min-width:200px;padding:12px 14px;border-radius:12px;border:2px solid var(--vien);font-size:18px;background:#fff}
+.on-dien input:focus{outline:none;border-color:var(--chinh)}
+.on-dap{margin-top:10px;padding:12px 14px;border-radius:14px;background:#fff7e6;border:1.5px dashed var(--cam)}
+.on-tot{margin-top:10px;padding:12px 14px;border-radius:14px;background:#e8f8ee;border:1.5px solid var(--dung)}
 </style>
 </head>
 <body>
@@ -254,6 +279,7 @@ textarea.dan{width:100%;min-height:90px;border-radius:12px;border:1.5px solid va
   <nav>
     <a href="#trang-chu" data-man="trang-chu">🧗 Luyện viết</a>
     <a href="#hoi" data-man="hoi">🧭 Hỏi gia sư</a>
+    <a href="#on" data-man="on">📘 Ôn bài</a>
     <a href="#gv" data-man="gv">📊 Bàn GV</a>
     <a href="#soan" data-man="soan">✍️ Soạn</a>
   </nav>
@@ -752,6 +778,11 @@ function manTrangChu(){
     <span class="cua-hoi-icon">🧭</span>
     <span><b>Em đang bí bài nào? Hỏi gia sư</b><br><span>Mọi môn THCS · mọi câu hỏi · gia sư dẫn em từng bước, không làm hộ</span></span>
     <span class="cua-hoi-mui">Hỏi ngay ➜</span>
+  </a>
+  <a class="cua-on hien" href="#on">
+    <span class="cua-hoi-icon">📘</span>
+    <span><b>Ôn lại bài vừa học</b><br><span>Câu hỏi nhớ kiến thức · thang 4 bậc · không đưa đáp án, không bị bí hẳn</span></span>
+    <span class="cua-hoi-mui" style="background:var(--b1);color:#fff">Ôn ngay ➜</span>
   </a>
   <h2 style="margin:18px 0 0">🧗 Luyện viết theo đề của thầy cô</h2>
   <p class="nho">Đề mẫu có sẵn — thầy cô thêm được bao nhiêu đề tuỳ ý ở mục ✍️ Soạn.</p>
@@ -1629,6 +1660,244 @@ function phienMau(bai, buoc){
   p.chu = chu; p.go = chu.length; p.tl.push([tu.length * 20].concat(khacBiet(p.tlCuoi, chu))); p.tlCuoi = chu;
   return p;
 }
+/* =====================================================================
+   10. ÔN BÀI — nhớ lại kiến thức theo THANG, không đưa đáp án
+   Mỗi câu có 4 bậc gợi mở. Bậc 1 mở sẵn; bậc sau chỉ mở khi em đã thử trả lời (hoặc nghĩ đủ lâu rồi bấm «Em chưa nhớ»).
+   Đáp án chuẩn chỉ hiện sau 4 lần thử — rồi em tự chọn / gõ lại để ghi nhớ, nên không bao giờ bị bí hẳn.
+   Nội dung do AI soạn nháp từ giáo án và đề của giáo viên — ✅ BẢN NHÁP, thầy/cô đối chiếu SGK trước khi giao.
+   Thêm bài ôn mới: thêm một phần tử vào BAI_ON theo đúng mẫu bên dưới.
+   ===================================================================== */
+const TEN_ON = ["Nhớ lại", "Manh mối", "Thu hẹp", "Gần tới đích"];
+const BAI_ON = [
+ {id:"van8-yeu-nuoc", lop:8, mon:"van", hinh:"nghiluan", unit:"Tinh thần yêu nước của nhân dân ta · Hồ Chí Minh",
+  gioiThieu:"Ôn lại văn bản em vừa học. Mỗi câu có 4 bậc gợi mở: em thử trả lời trước, chưa đúng thì bậc sau mới mở. Đáp án chuẩn chỉ hiện khi em đã thử nhiều lần.",
+  cau:[
+   {y:"Tác giả", loai:"chon", hoi:"Văn bản «Tinh thần yêu nước của nhân dân ta» do ai viết?",
+    chon:["Lý Thường Kiệt", "Trần Quốc Tuấn", "Nguyễn Trãi", "Hồ Chí Minh"], dung:3, loaiBo:[0, 1],
+    thang:["Văn bản trích từ một báo cáo chính trị đọc trước Đại hội của Đảng, vào thời kì kháng chiến chống Pháp. Em nghĩ xem: ai là người đứng ra đọc một báo cáo quan trọng như vậy?",
+           "Tác giả sinh năm 1890 ở Nam Đàn (Nghệ An), cũng là người viết «Tuyên ngôn độc lập» năm 1945.",
+           "Cú đã gạch bớt hai tên chưa hợp lí. Em xem hai tên còn lại.",
+           "Một trong hai người còn lại sống ở thế kỉ XV; người kia là lãnh tụ của cuộc kháng chiến chống Pháp. Văn bản này viết năm 1951."],
+    gt:"Hồ Chí Minh (1890 – 1969), quê Nam Đàn, Nghệ An. Em đối chiếu phần «Tác giả» trong SGK."},
+   {y:"Thể loại", loai:"chon", hoi:"Văn bản này thuộc kiểu văn bản nào?",
+    chon:["Tùy bút", "Truyện truyền kì", "Văn bản nghị luận", "Thơ lục bát"], dung:2, loaiBo:[1, 3],
+    thang:["Bài có luận đề, các luận điểm, lí lẽ và bằng chứng. Em nhớ những thứ đó đặc trưng cho kiểu văn bản nào?",
+           "Người viết muốn thuyết phục người nghe tin và làm theo một ý kiến, chứ không kể chuyện, không tả cảnh.",
+           "Cú đã gạch bớt hai phương án không hợp lí. Còn lại: một kiểu thiên về cảm xúc tản mạn, một kiểu thiên về lập luận.",
+           "Bài này lập luận bằng lí lẽ và bằng chứng lịch sử để thuyết phục — em chọn kiểu thiên về lập luận."],
+    gt:"Văn bản nghị luận: có luận đề «Tinh thần yêu nước», các luận điểm, lí lẽ và bằng chứng."},
+   {y:"Xuất xứ (năm)", loai:"dien", hoi:"Văn bản được trích từ Báo cáo chính trị tại Đại hội lần thứ II của Đảng Lao động Việt Nam, vào tháng 2 năm ______ .",
+    dapAn:["1951"],
+    thang:["Đại hội II diễn ra trong thời kì kháng chiến chống thực dân Pháp — sau Cách mạng tháng Tám 1945 và trước chiến thắng Điện Biên Phủ năm 1954.",
+           "Năm cần điền nằm giữa 1946 (toàn quốc kháng chiến) và 1954. Em nhớ lại con số ghi ở phần «Xuất xứ» trong SGK.",
+           "Chỉ còn hai khả năng: 1949 hoặc 1951.",
+           "Hai chữ số cuối là «5» rồi «1»."],
+    gt:"Tháng 2 năm 1951, Đại hội lần thứ II của Đảng Lao động Việt Nam."},
+   {y:"Nhân vật lịch sử", loai:"chon", hoi:"Trong đoạn nhắc lại truyền thống chống ngoại xâm, tác giả điểm tên những vị anh hùng nào? Chọn tên CÓ trong bài:",
+    chon:["Khúc Thừa Dụ", "Mai Hắc Đế", "Quang Trung", "Phùng Hưng"], dung:2, loaiBo:[0, 3],
+    thang:["Em nhớ đoạn nhắc truyền thống chống giặc ngoại xâm: tác giả kể các anh hùng theo thứ tự thời gian, bắt đầu từ thời Hai Bà Trưng.",
+           "Thứ tự: Hai Bà Trưng → Bà Triệu → Trần Hưng Đạo → Lê Lợi → … Em tìm tên đứng cuối danh sách, một anh hùng áo vải ở thế kỉ XVIII.",
+           "Cú đã gạch bớt hai tên. Em đối chiếu hai tên còn lại với danh sách ở bậc 2.",
+           "Vị anh hùng áo vải cuối danh sách, người đại phá quân Thanh, có tên thật là Nguyễn Huệ."],
+    gt:"Bài nhắc Hai Bà Trưng, Bà Triệu, Trần Hưng Đạo, Lê Lợi, Quang Trung — theo thứ tự thời gian. Em đối chiếu SGK."},
+   {y:"Hình ảnh «làn sóng»", loai:"chon", hoi:"Tác giả dùng hình ảnh nào để nói về sức mạnh của tinh thần yêu nước mỗi khi Tổ quốc bị xâm lăng?",
+    chon:["Ngọn đuốc soi đường", "Cơn mưa rào", "Bức tường thành", "Làn sóng mạnh mẽ, to lớn"], dung:3, loaiBo:[0, 1],
+    thang:["Tinh thần ấy «lướt qua mọi nguy hiểm, khó khăn» và «nhấn chìm» kẻ thù. Em hình dung hình ảnh nào trong thiên nhiên vừa lướt đi vừa nhấn chìm được?",
+           "Hình ảnh này ở sông, biển, chuyển động dồn dập và càng về sau càng dâng cao.",
+           "Cú đã gạch bớt hai phương án. Trong hai hình ảnh còn lại, cái nào có thể «lướt qua» và «nhấn chìm»?",
+           "Một bức tường thành thì đứng yên, không thể «lướt qua». Chỉ còn hình ảnh chuyển động."],
+    gt:"Hình ảnh «làn sóng» — vừa mạnh mẽ, to lớn, vừa lướt qua khó khăn và nhấn chìm kẻ thù."},
+   {y:"«của quý»", loai:"dien", hoi:"Tác giả so sánh tinh thần yêu nước với các thứ ______ .",
+    dapAn:["của quý"],
+    thang:["Tác giả so sánh tinh thần yêu nước với những vật mà người ta rất trân trọng và gìn giữ. Em thử nghĩ: đó là những thứ như thế nào?",
+           "Cụm từ gồm hai tiếng; tiếng thứ hai nghĩa là «đáng giá, cao quý».",
+           "Cụm từ có dạng «của + một tiếng chỉ giá trị». Hai chữ cái đầu của hai tiếng là «c» và «q».",
+           "Em ghép: tiếng thứ nhất chỉ sự sở hữu (vật thuộc về ai), tiếng thứ hai là «quý»."],
+    gt:"«các thứ của quý» — vật quý giá, đáng trân trọng và gìn giữ."},
+   {y:"«trưng bày»", loai:"dien", hoi:"Có khi tinh thần yêu nước được ______ trong tủ kính, trong bình pha lê, ai cũng nhìn thấy; có khi lại được cất kín đáo, khó thấy.",
+    dapAn:["trưng bày"],
+    thang:["Em hình dung món đồ quý đặt trong tủ kính ở bảo tàng: người ta làm gì với nó để ai cũng nhìn thấy?",
+           "Từ cần điền gồm hai tiếng và có nghĩa ngược với «cất giấu».",
+           "Chữ cái đầu là «tr». Em nghĩ tới từ dùng cho gian hàng, triển lãm.",
+           "Tiếng thứ hai là «bày» (bày ra cho mọi người xem)."],
+    gt:"«trưng bày» — đặt ra cho mọi người nhìn thấy; đối lập với việc cất giấu kín đáo."},
+   {y:"«thực hành»", loai:"dien", hoi:"Ở đoạn cuối, tác giả nêu bổn phận của chúng ta: làm cho tinh thần yêu nước của mọi người đều được ______ vào công việc yêu nước, công việc kháng chiến.",
+    dapAn:["thực hành"],
+    thang:["Tác giả không chỉ muốn mọi người «có» lòng yêu nước mà còn muốn họ làm gì với nó? Em nghĩ tới những việc làm cụ thể.",
+           "Từ cần điền gồm hai tiếng; đi với «lí thuyết» thành một cặp từ trái nghĩa.",
+           "Chữ cái đầu là «th». Từ này nghĩa là «làm thật, làm cụ thể».",
+           "Tiếng đầu là «thực» (như trong «thực tế»), tiếng sau là «hành» (như trong «hành động»)."],
+    gt:"«thực hành» — đưa tinh thần yêu nước vào việc làm cụ thể, không chỉ ở trong lòng."},
+   {y:"«nhi đồng»", loai:"dien", hoi:"Tác giả viết: «từ các cụ già tóc bạc đến các cháu ______ trẻ thơ». Điền từ chỉ trẻ em còn thiếu.",
+    dapAn:["nhi đồng"],
+    thang:["Cách viết «từ … đến …» nêu hai đầu của một dãy lứa tuổi: già nhất và nhỏ nhất. Em nhớ từ chỉ trẻ em ở đầu bên kia.",
+           "Từ gồm hai tiếng gốc Hán, nghĩa là «trẻ em» (cùng gốc với «nhi khoa» — khoa khám bệnh cho trẻ em).",
+           "Chữ cái đầu của tiếng thứ nhất là «nh», của tiếng thứ hai là «đ».",
+           "Tiếng thứ nhất là «nhi»; tiếng thứ hai bắt đầu bằng «đ» và có chữ «ô»."],
+    gt:"«nhi đồng» — nói về trẻ em; đối lập với «cụ già tóc bạc» để thấy mọi lứa tuổi đều yêu nước."},
+   {y:"«bán nước»", loai:"dien", hoi:"Làn sóng yêu nước nhấn chìm lũ cướp nước và cả lũ ______ .",
+    dapAn:["bán nước"],
+    thang:["Kẻ thù của dân tộc có hai loại: kẻ từ ngoài kéo đến («cướp nước») và kẻ ở ngay trong hàng ngũ ta. Loại thứ hai là ai?",
+           "Đó là những kẻ vì lợi ích riêng mà phản bội đất nước, làm tay sai cho giặc.",
+           "Cụm từ gồm hai tiếng; tiếng đầu chỉ hành động trao đổi lấy tiền (đối lập với «mua»).",
+           "Tiếng đầu là «bán»; tiếng sau là «nước»."],
+    gt:"«lũ bán nước và lũ cướp nước» — hai hạng kẻ thù bị làn sóng yêu nước nhấn chìm."},
+   {y:"Số luận điểm", loai:"chon", hoi:"Theo cách chia trong giờ học, văn bản nghị luận này có mấy luận điểm?",
+    chon:["2 luận điểm", "3 luận điểm", "4 luận điểm", "5 luận điểm"], dung:1, loaiBo:[0, 3],
+    thang:["Em nhớ sơ đồ tư duy của nhóm: từ luận đề «Tinh thần yêu nước», có bao nhiêu nhánh ý lớn toả ra?",
+           "Các ý lớn đi theo thứ tự: nêu vấn đề → chứng minh vấn đề → khẳng định, kêu gọi hành động.",
+           "Cú đã gạch bớt hai con số. Em đếm lại các ý lớn ở bậc 2.",
+           "Ở bậc 2 có ba ý lớn nối với nhau bằng mũi tên — em đếm lại."],
+    gt:"3 luận điểm: (1) nêu vấn đề; (2) chứng minh qua lịch sử đấu tranh giữ nước và cuộc kháng chiến chống Pháp; (3) khẳng định, nêu hướng hành động. (Mở rộng từ giáo án.)"},
+   {y:"Kháng chiến chống Pháp", loai:"dien", hoi:"Ở luận điểm 2, tác giả chứng minh lòng yêu nước bằng bằng chứng từ lịch sử đấu tranh giữ nước xưa kia và từ cuộc kháng chiến chống ______ ngày nay.",
+    dapAn:["pháp", "thực dân pháp"],
+    thang:["Văn bản viết năm 1951, giữa lúc cả dân tộc đang kháng chiến. Kẻ xâm lược khi ấy là nước nào?",
+           "Cuộc kháng chiến này kết thúc bằng chiến thắng Điện Biên Phủ năm 1954.",
+           "Đó là một nước ở châu Âu; tên chỉ có một tiếng.",
+           "Chữ cái đầu là «P»."],
+    gt:"Cuộc kháng chiến chống thực dân Pháp — đang diễn ra khi văn bản được viết (1951). (Mở rộng từ giáo án.)"}
+  ]}
+];
+
+const onKhoa = id => "on_" + id;
+const onMoi = bai => ({id:bai.id, hang:bai.cau.map((_, i) => i), tt:{}});
+const onChuanHoa = s => String(s || "").normalize("NFC").toLowerCase().replace(/[.,;:!?"“”‘’'«»()\-–—_]+/g, " ").replace(/\s+/g, " ").trim();
+const onBoDau = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/đ/g, "d");
+const onMau = d => d.split(" ").map(w => { const a = Array.from(w); return a[0] + a.slice(1).map(() => " _").join(""); }).join("      ");
+function onCham(c, nhap){
+  const n = onChuanHoa(nhap); if (!n) return "trong";
+  const ks = c.dapAn.map(onChuanHoa), m = onBoDau(n);
+  if (ks.some(k => n === k || (n.split(" ").length <= k.split(" ").length + 3 && (" " + n + " ").includes(" " + k + " ")))) return "dung";
+  if (ks.some(k => onBoDau(k) === m || (" " + m + " ").includes(" " + onBoDau(k) + " "))) return "gan";
+  return "sai";
+}
+
+let OST = null, onTimer = null;   /* phiên ôn: {id, hang:[chỉ số câu còn lại], tt:{câu → {thu, tried, cuu, xong, luc}}} */
+const onLuu = () => OST && kho.ghi(onKhoa(OST.id), OST);
+const onSoCho = t => Math.max(0, 8 - Math.floor((nay() - (t.luc || nay())) / 1000));
+
+function onDanhSach(){
+  return `<section class="the on-dau hien"><h2>📘 Ôn bài theo thang</h2>
+    <p>Ôn lại kiến thức vừa học. Mỗi câu có <b>4 bậc gợi mở</b>: em thử trả lời trước, chưa đúng mới mở bậc sau. Đáp án chuẩn chỉ hiện khi em đã thử nhiều lần — và lúc nào cũng có gợi ý để em không bị bí hẳn.</p></section>
+    <div class="ds-bai" style="margin-top:14px">${BAI_ON.map(b => {
+      const s = kho.doc(onKhoa(b.id), null), xong = s && s.tt ? Object.values(s.tt).filter(x => x.xong).length : 0;
+      return `<a class="the-bai hien" href="#on&b=${esc(b.id)}" style="text-decoration:none;color:inherit">${HINH[b.hinh] || HINH.rieng}
+        <span><span class="nhan">Lớp ${b.lop} · ${esc(MON[b.mon])} · ôn bài</span><br><span class="td">${esc(b.unit)}</span><br>
+        <span class="nho">${b.cau.length} câu · thang 4 bậc · đã xong ${xong}/${b.cau.length}</span></span></a>`; }).join("")}</div>
+    <p class="nho" style="margin-top:14px">Bài ôn do AI soạn nháp, giáo viên duyệt. Em luôn đối chiếu SGK để chắc chắn.</p>`;
+}
+
+function hienOn(o, id){
+  clearInterval(onTimer);
+  if (!id){ o.innerHTML = onDanhSach(); return; }
+  const bai = BAI_ON.find(b => b.id === id);
+  if (!bai){ location.hash = "on"; return; }
+  const cu = kho.doc(onKhoa(id), null);
+  OST = cu && cu.tt && Array.isArray(cu.hang) ? cu : onMoi(bai);
+  o.innerHTML = `<div class="on">
+    <section class="the on-dau"><a class="nho" href="#on">← Các bài ôn</a><h2 style="margin-top:4px">📘 ${esc(bai.unit)}</h2>
+      <p>${esc(bai.gioiThieu)}</p>
+      <div class="nho">✅ BẢN NHÁP — AI soạn nháp, giáo viên duyệt. Em đối chiếu SGK ${esc(MON[bai.mon])} ${bai.lop} (Kết nối tri thức).</div></section>
+    <div id="onThan"></div></div>`;
+  const than = $("#onThan");
+  than.onclick = e => { const b = e.target.closest("button"); if (!b || b.disabled) return;
+    if (b.dataset.c != null) onAct(bai, "chon", b.dataset.c);
+    else if (b.dataset.a === "kiem") onAct(bai, "kiem", ($("#onO") || {}).value || "");
+    else if (b.dataset.a) onAct(bai, b.dataset.a); };
+  than.onkeydown = e => { if (e.key === "Enter" && e.target.id === "onO"){ e.preventDefault(); onAct(bai, "kiem", e.target.value); } };
+  veOn(bai);
+}
+
+function onAct(bai, a, val){
+  const i = OST.hang[0]; if (i == null && a !== "lai-can" && a !== "lai-het") return;
+  const c = i != null ? bai.cau[i] : null, t = i != null ? (OST.tt[i] = OST.tt[i] || {thu:0, tried:[], cuu:false, xong:false, luc:nay()}) : null;
+  if (a === "chon" || a === "kiem"){
+    if (t.xong) return;
+    let kq = "sai";
+    if (a === "chon") kq = +val === c.dung ? "dung" : "sai"; else kq = onCham(c, val);
+    if (kq === "trong"){ veOn(bai, "Em gõ đáp án vào ô trống rồi bấm <b>Kiểm tra</b> nhé.", "nghi", val); return; }
+    if (kq === "gan"){ keu("chan"); veOn(bai, "Đúng ý rồi! Em kiểm tra lại <b>dấu và chính tả</b> rồi bấm Kiểm tra lại nhé.", "nghi", val); return; }
+    if (kq === "dung"){ t.xong = true; keu("ting"); onLuu();
+      veOn(bai, t.cuu ? "Tốt lắm — em đã ghi nhớ đáp án. Mở SGK đối chiếu lại một lần nhé." : t.thu ? `Giỏi quá! Em tự tìm ra ở lần thử thứ <b>${t.thu + 1}</b>.` : "Em nhớ đúng ngay lần đầu — chắc bài lắm!"); return; }
+    t.thu++; t.luc = nay(); if (a === "chon") t.tried.push(+val);
+    keu("chan"); onLuu();
+    const moMoi = Math.min(4, 1 + t.thu);
+    veOn(bai, t.thu >= 4 ? "Em đã thử nhiều lần rồi — không sao. Đọc lại bậc 4 thật kĩ; nếu vẫn chưa ra, bấm <b>🆘 Xem đáp án chuẩn</b> rồi em tự chọn / gõ lại để nhớ."
+      : `Chưa đúng — không sao! Cú mở thêm <b>bậc ${moMoi} · ${TEN_ON[moMoi - 1]}</b> cho em. Đọc kĩ rồi thử lại nhé.`, "nghi", a === "kiem" ? val : ""); return;
+  }
+  if (a === "chua"){ if (onSoCho(t)) return; t.thu++; t.luc = nay(); onLuu(); keu("mo");
+    const moMoi = Math.min(4, 1 + t.thu); veOn(bai, `Cú mở <b>bậc ${moMoi} · ${TEN_ON[moMoi - 1]}</b> cho em. Đọc kĩ rồi thử trả lời nhé.`); return; }
+  if (a === "cuu"){ if (t.thu < 4) return; t.cuu = true; onLuu(); veOn(bai, "Đây là đáp án chuẩn. Em <b>tự chọn / gõ lại</b> để ghi nhớ nhé — rồi mở SGK đối chiếu."); return; }
+  if (a === "qua"){ OST.hang.push(OST.hang.shift()); onLuu(); veOn(bai, "Em làm câu khác trước, lát quay lại câu này nhé."); return; }
+  if (a === "tiep"){ OST.hang.shift(); onLuu(); if (!OST.hang.length){ keu("xong"); phaoGiay(); } veOn(bai); return; }
+  if (a === "lai-can"){ const on = bai.cau.map((_, j) => j).filter(j => { const x = OST.tt[j]; return x && (x.cuu || x.thu >= 3); });
+    on.forEach(j => delete OST.tt[j]); OST.hang = on; onLuu(); veOn(bai); return; }
+  if (a === "lai-het"){ kho.xoa(onKhoa(bai.id)); OST = onMoi(bai); veOn(bai); return; }
+}
+
+function onTongKet(bai){
+  const ds = bai.cau.map((c, j) => ({c, t: OST.tt[j] || {thu:0, cuu:false}})), n = ds.length;
+  const tu = ds.filter(x => !x.t.cuu && !x.t.thu).length, goi = ds.filter(x => !x.t.cuu && x.t.thu).length, cuu = ds.filter(x => x.t.cuu).length;
+  const on = ds.filter(x => x.t.cuu || x.t.thu >= 3);
+  return `<section class="the on-the hien"><h2>🎉 Em đã đi hết thang!</h2>
+    <p style="margin-top:6px">Nhớ đúng ngay: <b>${tu}</b>/${n} · cần gợi ý: <b>${goi}</b> · cần xem đáp án: <b>${cuu}</b></p>
+    ${on.length ? `<h3 style="margin-top:12px">Nên ôn lại</h3><div style="margin-top:4px">${on.map(x => `<span class="chip">${esc(x.c.y)}</span>`).join("")}</div>`
+      : `<p style="margin-top:8px">Không câu nào phải xem đáp án — em nhớ bài rất chắc!</p>`}
+    <p class="nho" style="margin-top:12px">Kết quả này chỉ để em tự biết chỗ nào còn chưa chắc, không tính vào điểm học tập. Em mở SGK đối chiếu lại những ý trên nhé.</p>
+    <div class="hang-nut" style="margin-top:12px">${on.length ? `<button class="nut cam" data-a="lai-can">🔁 Ôn lại ${on.length} câu cần ôn</button>` : ""}
+      <button class="nut phu2" data-a="lai-het">↺ Làm lại từ đầu</button><a class="nut phu2" href="#trang-chu">🏠 Về trang chủ</a></div></section>`;
+}
+
+function veOn(bai, loi, kieu, giu){
+  const o = $("#onThan"); if (!o) return;
+  clearInterval(onTimer);
+  const i = OST.hang[0];
+  if (i == null){ o.innerHTML = onTongKet(bai); return; }
+  const c = bai.cau[i], t = (OST.tt[i] = OST.tt[i] || {thu:0, tried:[], cuu:false, xong:false, luc:nay()});
+  const mo = Math.min(4, 1 + t.thu), tong = bai.cau.length;
+  const dau = j => { const x = OST.tt[j]; return j === i ? "dang" : !x || !x.xong ? "" : x.cuu ? "cuu" : x.thu ? "goi" : "tu"; };
+  const tien = bai.cau.map((_, j) => `<i class="${dau(j)}">${j + 1}</i>`).join("");
+  const thang = TEN_ON.map((ten, k) => {
+    const m = k < mo; let than = "";
+    if (m){ than = `<p>${esc(c.thang[k])}</p>`; if (k === 3 && c.loai === "dien") than += `<div class="khung-cau">${esc(onMau(c.dapAn[0]))}</div>`; }
+    return `<div class="bac ${m ? "" : "khoa"}"><div class="bac-dau"><span class="bac-so" style="background:${MAU_BAC[k]}">${k + 1}</span><span class="bac-ten">${esc(ten)}</span>
+      <span class="bac-tt">${m ? "✅ Đã mở" : "🔒 Sau lần thử thứ " + k}</span></div>${m ? `<div class="bac-than">${than}</div>` : ""}</div>`;
+  }).join("");
+  let tra;
+  if (c.loai === "chon"){
+    tra = `<div class="on-chon">${c.chon.map((x, j) => {
+      const thu = t.tried.includes(j), loai = mo >= 3 && c.loaiBo.includes(j) && !t.xong, dung = t.xong && j === c.dung;
+      return `<button data-c="${j}" class="${thu ? "thu" : ""} ${loai ? "loai" : ""} ${dung ? "dung" : ""}" ${thu || loai || t.xong ? "disabled" : ""}><b>${"ABCD"[j]}.</b> ${esc(x)}${loai ? ` <span class="nho">(đã gạch)</span>` : ""}${thu ? ` <span class="nho">(chưa đúng)</span>` : ""}</button>`; }).join("")}</div>`;
+  } else {
+    tra = `<div class="on-dien"><input id="onO" autocomplete="off" spellcheck="false" placeholder="Em gõ đáp án vào đây…" value="${esc(t.xong ? c.dapAn[0] : (giu || ""))}" ${t.xong ? "disabled" : ""}>
+      <button class="nut" data-a="kiem" ${t.xong ? "disabled" : ""}>✅ Kiểm tra</button></div>`;
+  }
+  const cho = onSoCho(t);
+  let nut = "";
+  if (!t.xong){
+    if (mo < 4) nut += `<button class="nut phu2" id="nChuaNho" data-a="chua" ${cho ? "disabled" : ""}>🤔 Em chưa nhớ — mở bậc ${mo + 1}${cho ? ` (nghĩ thêm ${cho}s)` : ""}</button>`;
+    if (t.thu >= 4 && !t.cuu) nut += `<button class="nut cam" data-a="cuu">🆘 Xem đáp án chuẩn</button>`;
+    if (OST.hang.length > 1) nut += `<button class="nut phu2" data-a="qua">⏭ Làm câu khác trước</button>`;
+  } else nut = `<button class="nut xanh" data-a="tiep">${OST.hang.length > 1 ? "Câu tiếp ➜" : "Xem kết quả ➜"}</button>`;
+  const dapCuu = t.cuu && !t.xong ? `<div class="on-dap"><b>Đáp án chuẩn:</b> ${esc(c.loai === "chon" ? "ABCD"[c.dung] + ". " + c.chon[c.dung] : c.dapAn[0])}<br>
+    <span class="nho">Em ${c.loai === "chon" ? "chọn" : "gõ"} lại đáp án này để ghi nhớ, rồi mới sang câu sau. Nhớ đối chiếu SGK nhé.</span></div>` : "";
+  const tot = t.xong ? `<div class="on-tot">✅ ${t.cuu ? "Em đã ghi nhớ đáp án." : t.thu ? `Em đúng ở lần thử thứ ${t.thu + 1}!` : "Em nhớ đúng ngay lần đầu!"}<br><span class="nho">${esc(c.gt)}</span></div>` : "";
+  o.innerHTML = `<section class="the on-the hien">
+    <div class="on-tien">${tien}</div>
+    <div class="nho">Câu ${i + 1}/${tong} · đã xong ${tong - OST.hang.length + (t.xong ? 0 : 0)}/${tong}</div>
+    <div class="cu-hang"><svg class="cu" id="cuSvg" viewBox="0 0 100 104"><use href="#cu"/></svg><div class="loi-cu" id="loiCu"></div></div>
+    <div class="on-cau">${esc(c.hoi).replace(/_{3,}/g, '<span class="on-cho"></span>')}</div>
+    ${tra}${dapCuu}${tot}
+    <div class="hang-nut" style="margin-top:10px">${nut}</div></section>
+    <section class="o-thang the" style="margin-top:14px"><h3>🧗 Thang gợi mở — mở dần khi em thử trả lời</h3>${thang}</section>`;
+  mascot(loi || (t.xong ? "Giỏi lắm! Bấm sang câu tiếp nhé." : t.thu ? `Em đang ở bậc <b>${mo} · ${TEN_ON[mo - 1]}</b>. Đọc gợi ý rồi thử lại nhé.` : `Câu ${i + 1}: em thử trả lời trước nhé. Chưa chắc thì đọc <b>bậc 1</b> bên dưới.`), kieu);
+  if (kieu === "nghi" && $("#onO") && !t.xong) $("#onO").focus();
+  if (cho && !t.xong && mo < 4) onTimer = setInterval(() => {
+    const b = $("#nChuaNho"), r = onSoCho(t); if (!b){ clearInterval(onTimer); return; }
+    b.disabled = r > 0; b.textContent = `🤔 Em chưa nhớ — mở bậc ${mo + 1}` + (r ? ` (nghĩ thêm ${r}s)` : ""); if (!r) clearInterval(onTimer); }, 500);
+}
+
+
 function dieuHuong(){
   const h = decodeURIComponent(location.hash.slice(1));
   if (h.startsWith("bai-moi=")){
@@ -1667,6 +1936,7 @@ function dieuHuong(){
     o.innerHTML = manNop(p); ganNop(p); return;
   }
   if (ten === "gv" || ten === "phat-lai"){ o.innerHTML = manGV(mau || ten === "phat-lai"); ganGV(mau || ten === "phat-lai"); if (ten === "phat-lai") phatLai(DS[2]); return; }
+  if (ten === "on"){ hienOn(o, q.b); return; }
   if (ten === "soan"){ o.innerHTML = manSoan(mau); ganSoan(); return; }
   if (ten === "hoi"){ o.innerHTML = manHoi(mau); ganHoi();
     if (mau){ $("#hCau").value = "Tìm x biết 3x + 5 = 20, em làm mãi không ra"; H = {t0:nay(), mon:"toan", lop:7, cau:$("#hCau").value, loai:"tinh-toan", buoc:["Đề cho: 3x + 5 = 20", "Hỏi: tìm x"], nho:0, ket:""};

@@ -1662,100 +1662,100 @@ function phienMau(bai, buoc){
 }
 /* =====================================================================
    10. ÔN BÀI — nhớ lại kiến thức theo THANG, không đưa đáp án
-   Mỗi câu có 4 bậc gợi mở. Bậc 1 mở sẵn; bậc sau chỉ mở khi em đã thử trả lời (hoặc nghĩ đủ lâu rồi bấm «Em chưa nhớ»).
+   Mỗi câu có 4 bậc gợi mở. Bậc 1 mở sẵn; mỗi lần em thử trả lời thì mở thêm một bậc (hoặc nghĩ đủ lâu rồi bấm «Em chưa nhớ»).
    Đáp án chuẩn chỉ hiện sau 4 lần thử — rồi em tự chọn / gõ lại để ghi nhớ, nên không bao giờ bị bí hẳn.
    Nội dung do AI soạn nháp từ giáo án và đề của giáo viên — ✅ BẢN NHÁP, thầy/cô đối chiếu SGK trước khi giao.
    Thêm bài ôn mới: thêm một phần tử vào BAI_ON theo đúng mẫu bên dưới.
    ===================================================================== */
 const TEN_ON = ["Nhớ lại", "Manh mối", "Thu hẹp", "Gần tới đích"];
 const BAI_ON = [
- {id:"van8-yeu-nuoc", lop:8, mon:"van", hinh:"nghiluan", unit:"Tinh thần yêu nước của nhân dân ta · Hồ Chí Minh",
-  gioiThieu:"Ôn lại văn bản em vừa học. Mỗi câu có 4 bậc gợi mở: em thử trả lời trước, chưa đúng thì bậc sau mới mở. Đáp án chuẩn chỉ hiện khi em đã thử nhiều lần.",
+ {id:"van8-yeu-nuoc", lop:8, mon:"van", hinh:"nghiluan", sgk:"Tập 1: văn bản ở trang 65–66, tác giả và xuất xứ ở trang 67.", unit:"Tinh thần yêu nước của nhân dân ta · Hồ Chí Minh",
+  gioiThieu:"Ôn lại văn bản em vừa học. Mỗi câu có 4 bậc gợi mở: em tự thử trả lời trước, mỗi lần em thử thêm là một bậc gợi ý mới mở ra. Đáp án chuẩn chỉ hiện sau khi em đã thử nhiều lần.",
   cau:[
    {y:"Tác giả", loai:"chon", hoi:"Văn bản «Tinh thần yêu nước của nhân dân ta» do ai viết?",
     chon:["Lý Thường Kiệt", "Trần Quốc Tuấn", "Nguyễn Trãi", "Hồ Chí Minh"], dung:3, loaiBo:[0, 1],
     thang:["Văn bản trích từ một báo cáo chính trị đọc trước Đại hội của Đảng, vào thời kì kháng chiến chống Pháp. Em nghĩ xem: ai là người đứng ra đọc một báo cáo quan trọng như vậy?",
            "Tác giả sinh năm 1890 ở Nam Đàn (Nghệ An), cũng là người viết «Tuyên ngôn độc lập» năm 1945.",
-           "Cú đã gạch bớt hai tên chưa hợp lí. Em xem hai tên còn lại.",
+           "Cú đã gạch bớt hai tên ít khả năng nhất. Em xem hai tên còn lại.",
            "Một trong hai người còn lại sống ở thế kỉ XV; người kia là lãnh tụ của cuộc kháng chiến chống Pháp. Văn bản này viết năm 1951."],
-    gt:"Hồ Chí Minh (1890 – 1969), quê Nam Đàn, Nghệ An. Em đối chiếu phần «Tác giả» trong SGK."},
+    gt:"Hồ Chí Minh (1890 – 1969), quê Nam Đàn, Nghệ An. Em đối chiếu phần giới thiệu tác giả ở SGK trang 67."},
    {y:"Thể loại", loai:"chon", hoi:"Văn bản này thuộc kiểu văn bản nào?",
     chon:["Tùy bút", "Truyện truyền kì", "Văn bản nghị luận", "Thơ lục bát"], dung:2, loaiBo:[1, 3],
     thang:["Bài có luận đề, các luận điểm, lí lẽ và bằng chứng. Em nhớ những thứ đó đặc trưng cho kiểu văn bản nào?",
            "Người viết muốn thuyết phục người nghe tin và làm theo một ý kiến, chứ không kể chuyện, không tả cảnh.",
            "Cú đã gạch bớt hai phương án không hợp lí. Còn lại: một kiểu thiên về cảm xúc tản mạn, một kiểu thiên về lập luận.",
            "Bài này lập luận bằng lí lẽ và bằng chứng lịch sử để thuyết phục — em chọn kiểu thiên về lập luận."],
-    gt:"Văn bản nghị luận: có luận đề «Tinh thần yêu nước», các luận điểm, lí lẽ và bằng chứng."},
+    gt:"Văn bản nghị luận: có luận đề «Tinh thần yêu nước», các luận điểm, lí lẽ và bằng chứng (SGK trang 67, câu hỏi 1 – 2)."},
    {y:"Xuất xứ (năm)", loai:"dien", hoi:"Văn bản được trích từ Báo cáo chính trị tại Đại hội lần thứ II của Đảng Lao động Việt Nam, vào tháng 2 năm ______ .",
     dapAn:["1951"],
     thang:["Đại hội II diễn ra trong thời kì kháng chiến chống thực dân Pháp — sau Cách mạng tháng Tám 1945 và trước chiến thắng Điện Biên Phủ năm 1954.",
            "Năm cần điền nằm giữa 1946 (toàn quốc kháng chiến) và 1954. Em nhớ lại con số ghi ở phần «Xuất xứ» trong SGK.",
            "Chỉ còn hai khả năng: 1949 hoặc 1951.",
            "Hai chữ số cuối là «5» rồi «1»."],
-    gt:"Tháng 2 năm 1951, Đại hội lần thứ II của Đảng Lao động Việt Nam."},
+    gt:"Tháng 2 năm 1951, Đại hội lần thứ II của Đảng Lao động Việt Nam (SGK trang 67)."},
    {y:"Nhân vật lịch sử", loai:"chon", hoi:"Trong đoạn nhắc lại truyền thống chống ngoại xâm, tác giả điểm tên những vị anh hùng nào? Chọn tên CÓ trong bài:",
     chon:["Khúc Thừa Dụ", "Mai Hắc Đế", "Quang Trung", "Phùng Hưng"], dung:2, loaiBo:[0, 3],
     thang:["Em nhớ đoạn nhắc truyền thống chống giặc ngoại xâm: tác giả kể các anh hùng theo thứ tự thời gian, bắt đầu từ thời Hai Bà Trưng.",
            "Thứ tự: Hai Bà Trưng → Bà Triệu → Trần Hưng Đạo → Lê Lợi → … Em tìm tên đứng cuối danh sách, một anh hùng áo vải ở thế kỉ XVIII.",
            "Cú đã gạch bớt hai tên. Em đối chiếu hai tên còn lại với danh sách ở bậc 2.",
            "Vị anh hùng áo vải cuối danh sách, người đại phá quân Thanh, có tên thật là Nguyễn Huệ."],
-    gt:"Bài nhắc Hai Bà Trưng, Bà Triệu, Trần Hưng Đạo, Lê Lợi, Quang Trung — theo thứ tự thời gian. Em đối chiếu SGK."},
+    gt:"Bài nhắc Hai Bà Trưng, Bà Triệu, Trần Hưng Đạo, Lê Lợi, Quang Trung — theo thứ tự thời gian (SGK trang 66)."},
    {y:"Hình ảnh «làn sóng»", loai:"chon", hoi:"Tác giả dùng hình ảnh nào để nói về sức mạnh của tinh thần yêu nước mỗi khi Tổ quốc bị xâm lăng?",
     chon:["Ngọn đuốc soi đường", "Cơn mưa rào", "Bức tường thành", "Làn sóng mạnh mẽ, to lớn"], dung:3, loaiBo:[0, 1],
-    thang:["Tinh thần ấy «lướt qua mọi nguy hiểm, khó khăn» và «nhấn chìm» kẻ thù. Em hình dung hình ảnh nào trong thiên nhiên vừa lướt đi vừa nhấn chìm được?",
+    thang:["Tinh thần ấy «lướt qua mọi sự nguy hiểm, khó khăn» và «nhấn chìm» kẻ thù. Em hình dung hình ảnh nào trong thiên nhiên vừa lướt đi vừa nhấn chìm được?",
            "Hình ảnh này ở sông, biển, chuyển động dồn dập và càng về sau càng dâng cao.",
            "Cú đã gạch bớt hai phương án. Trong hai hình ảnh còn lại, cái nào có thể «lướt qua» và «nhấn chìm»?",
            "Một bức tường thành thì đứng yên, không thể «lướt qua». Chỉ còn hình ảnh chuyển động."],
-    gt:"Hình ảnh «làn sóng» — vừa mạnh mẽ, to lớn, vừa lướt qua khó khăn và nhấn chìm kẻ thù."},
+    gt:"Hình ảnh «làn sóng» — vừa mạnh mẽ, to lớn, vừa lướt qua khó khăn và nhấn chìm kẻ thù (SGK trang 65–66)."},
    {y:"«của quý»", loai:"dien", hoi:"Tác giả so sánh tinh thần yêu nước với các thứ ______ .",
     dapAn:["của quý"],
     thang:["Tác giả so sánh tinh thần yêu nước với những vật mà người ta rất trân trọng và gìn giữ. Em thử nghĩ: đó là những thứ như thế nào?",
            "Cụm từ gồm hai tiếng; tiếng thứ hai nghĩa là «đáng giá, cao quý».",
            "Cụm từ có dạng «của + một tiếng chỉ giá trị». Hai chữ cái đầu của hai tiếng là «c» và «q».",
            "Em ghép: tiếng thứ nhất chỉ sự sở hữu (vật thuộc về ai), tiếng thứ hai là «quý»."],
-    gt:"«các thứ của quý» — vật quý giá, đáng trân trọng và gìn giữ."},
+    gt:"«các thứ của quý» — vật quý giá, đáng trân trọng và gìn giữ (SGK trang 66)."},
    {y:"«trưng bày»", loai:"dien", hoi:"Có khi tinh thần yêu nước được ______ trong tủ kính, trong bình pha lê, ai cũng nhìn thấy; có khi lại được cất kín đáo, khó thấy.",
     dapAn:["trưng bày"],
     thang:["Em hình dung món đồ quý đặt trong tủ kính ở bảo tàng: người ta làm gì với nó để ai cũng nhìn thấy?",
            "Từ cần điền gồm hai tiếng và có nghĩa ngược với «cất giấu».",
            "Chữ cái đầu là «tr». Em nghĩ tới từ dùng cho gian hàng, triển lãm.",
            "Tiếng thứ hai là «bày» (bày ra cho mọi người xem)."],
-    gt:"«trưng bày» — đặt ra cho mọi người nhìn thấy; đối lập với việc cất giấu kín đáo."},
+    gt:"«trưng bày» — đặt ra cho mọi người nhìn thấy; đối lập với việc cất giấu kín đáo (SGK trang 66)."},
    {y:"«thực hành»", loai:"dien", hoi:"Ở đoạn cuối, tác giả nêu bổn phận của chúng ta: làm cho tinh thần yêu nước của mọi người đều được ______ vào công việc yêu nước, công việc kháng chiến.",
     dapAn:["thực hành"],
     thang:["Tác giả không chỉ muốn mọi người «có» lòng yêu nước mà còn muốn họ làm gì với nó? Em nghĩ tới những việc làm cụ thể.",
            "Từ cần điền gồm hai tiếng; đi với «lí thuyết» thành một cặp từ trái nghĩa.",
            "Chữ cái đầu là «th». Từ này nghĩa là «làm thật, làm cụ thể».",
            "Tiếng đầu là «thực» (như trong «thực tế»), tiếng sau là «hành» (như trong «hành động»)."],
-    gt:"«thực hành» — đưa tinh thần yêu nước vào việc làm cụ thể, không chỉ ở trong lòng."},
+    gt:"«thực hành» — đưa tinh thần yêu nước vào việc làm cụ thể, không chỉ ở trong lòng (SGK trang 66)."},
    {y:"«nhi đồng»", loai:"dien", hoi:"Tác giả viết: «từ các cụ già tóc bạc đến các cháu ______ trẻ thơ». Điền từ chỉ trẻ em còn thiếu.",
     dapAn:["nhi đồng"],
     thang:["Cách viết «từ … đến …» nêu hai đầu của một dãy lứa tuổi: già nhất và nhỏ nhất. Em nhớ từ chỉ trẻ em ở đầu bên kia.",
            "Từ gồm hai tiếng gốc Hán, nghĩa là «trẻ em» (cùng gốc với «nhi khoa» — khoa khám bệnh cho trẻ em).",
            "Chữ cái đầu của tiếng thứ nhất là «nh», của tiếng thứ hai là «đ».",
            "Tiếng thứ nhất là «nhi»; tiếng thứ hai bắt đầu bằng «đ» và có chữ «ô»."],
-    gt:"«nhi đồng» — nói về trẻ em; đối lập với «cụ già tóc bạc» để thấy mọi lứa tuổi đều yêu nước."},
+    gt:"«nhi đồng» — nói về trẻ em; đối lập với «cụ già tóc bạc» để thấy mọi lứa tuổi đều yêu nước (SGK trang 66)."},
    {y:"«bán nước»", loai:"dien", hoi:"Làn sóng yêu nước nhấn chìm lũ cướp nước và cả lũ ______ .",
     dapAn:["bán nước"],
     thang:["Kẻ thù của dân tộc có hai loại: kẻ từ ngoài kéo đến («cướp nước») và kẻ ở ngay trong hàng ngũ ta. Loại thứ hai là ai?",
            "Đó là những kẻ vì lợi ích riêng mà phản bội đất nước, làm tay sai cho giặc.",
            "Cụm từ gồm hai tiếng; tiếng đầu chỉ hành động trao đổi lấy tiền (đối lập với «mua»).",
            "Tiếng đầu là «bán»; tiếng sau là «nước»."],
-    gt:"«lũ bán nước và lũ cướp nước» — hai hạng kẻ thù bị làn sóng yêu nước nhấn chìm."},
+    gt:"«lũ bán nước và lũ cướp nước» — hai hạng kẻ thù bị làn sóng yêu nước nhấn chìm (SGK trang 65–66)."},
    {y:"Số luận điểm", loai:"chon", hoi:"Theo cách chia trong giờ học, văn bản nghị luận này có mấy luận điểm?",
     chon:["2 luận điểm", "3 luận điểm", "4 luận điểm", "5 luận điểm"], dung:1, loaiBo:[0, 3],
     thang:["Em nhớ sơ đồ tư duy của nhóm: từ luận đề «Tinh thần yêu nước», có bao nhiêu nhánh ý lớn toả ra?",
            "Các ý lớn đi theo thứ tự: nêu vấn đề → chứng minh vấn đề → khẳng định, kêu gọi hành động.",
            "Cú đã gạch bớt hai con số. Em đếm lại các ý lớn ở bậc 2.",
            "Ở bậc 2 có ba ý lớn nối với nhau bằng mũi tên — em đếm lại."],
-    gt:"3 luận điểm: (1) nêu vấn đề; (2) chứng minh qua lịch sử đấu tranh giữ nước và cuộc kháng chiến chống Pháp; (3) khẳng định, nêu hướng hành động. (Mở rộng từ giáo án.)"},
+    gt:"3 luận điểm: (1) nêu vấn đề; (2) chứng minh qua lịch sử đấu tranh giữ nước và cuộc kháng chiến chống Pháp; (3) khẳng định, nêu hướng hành động. (Câu hỏi 3, SGK trang 67; đáp án theo giáo án.)"},
    {y:"Kháng chiến chống Pháp", loai:"dien", hoi:"Ở luận điểm 2, tác giả chứng minh lòng yêu nước bằng bằng chứng từ lịch sử đấu tranh giữ nước xưa kia và từ cuộc kháng chiến chống ______ ngày nay.",
     dapAn:["pháp", "thực dân pháp"],
     thang:["Văn bản viết năm 1951, giữa lúc cả dân tộc đang kháng chiến. Kẻ xâm lược khi ấy là nước nào?",
            "Cuộc kháng chiến này kết thúc bằng chiến thắng Điện Biên Phủ năm 1954.",
            "Đó là một nước ở châu Âu; tên chỉ có một tiếng.",
            "Chữ cái đầu là «P»."],
-    gt:"Cuộc kháng chiến chống thực dân Pháp — đang diễn ra khi văn bản được viết (1951). (Mở rộng từ giáo án.)"}
+    gt:"Cuộc kháng chiến chống thực dân Pháp — đang diễn ra khi văn bản được viết (1951); chú thích SGK trang 66 ghi kháng chiến chống thực dân Pháp (1946 – 1954). (Mở rộng từ giáo án.)"}
   ]}
 ];
 
@@ -1778,7 +1778,7 @@ const onSoCho = t => Math.max(0, 8 - Math.floor((nay() - (t.luc || nay())) / 100
 
 function onDanhSach(){
   return `<section class="the on-dau hien"><h2>📘 Ôn bài theo thang</h2>
-    <p>Ôn lại kiến thức vừa học. Mỗi câu có <b>4 bậc gợi mở</b>: em thử trả lời trước, chưa đúng mới mở bậc sau. Đáp án chuẩn chỉ hiện khi em đã thử nhiều lần — và lúc nào cũng có gợi ý để em không bị bí hẳn.</p></section>
+    <p>Ôn lại kiến thức vừa học. Mỗi câu có <b>4 bậc gợi mở</b>: em tự thử trả lời trước, mỗi lần em thử thêm là một bậc gợi ý mới mở ra. Đáp án chuẩn chỉ hiện sau khi em đã thử nhiều lần — và lúc nào cũng có gợi ý để em không bị bí hẳn.</p></section>
     <div class="ds-bai" style="margin-top:14px">${BAI_ON.map(b => {
       const s = kho.doc(onKhoa(b.id), null), xong = s && s.tt ? Object.values(s.tt).filter(x => x.xong).length : 0;
       return `<a class="the-bai hien" href="#on&b=${esc(b.id)}" style="text-decoration:none;color:inherit">${HINH[b.hinh] || HINH.rieng}
@@ -1797,7 +1797,7 @@ function hienOn(o, id){
   o.innerHTML = `<div class="on">
     <section class="the on-dau"><a class="nho" href="#on">← Các bài ôn</a><h2 style="margin-top:4px">📘 ${esc(bai.unit)}</h2>
       <p>${esc(bai.gioiThieu)}</p>
-      <div class="nho">✅ BẢN NHÁP — AI soạn nháp, giáo viên duyệt. Em đối chiếu SGK ${esc(MON[bai.mon])} ${bai.lop} (Kết nối tri thức).</div></section>
+      <div class="nho">✅ BẢN NHÁP — AI soạn nháp, giáo viên duyệt. Em đối chiếu SGK ${esc(MON[bai.mon])} ${bai.lop} (Kết nối tri thức).${bai.sgk ? " " + esc(bai.sgk) : ""}</div></section>
     <div id="onThan"></div></div>`;
   const than = $("#onThan");
   than.onclick = e => { const b = e.target.closest("button"); if (!b || b.disabled) return;
@@ -1823,7 +1823,7 @@ function onAct(bai, a, val){
     keu("chan"); onLuu();
     const moMoi = Math.min(4, 1 + t.thu);
     veOn(bai, t.thu >= 4 ? "Em đã thử nhiều lần rồi — không sao. Đọc lại bậc 4 thật kĩ; nếu vẫn chưa ra, bấm <b>🆘 Xem đáp án chuẩn</b> rồi em tự chọn / gõ lại để nhớ."
-      : `Chưa đúng — không sao! Cú mở thêm <b>bậc ${moMoi} · ${TEN_ON[moMoi - 1]}</b> cho em. Đọc kĩ rồi thử lại nhé.`, "nghi", a === "kiem" ? val : ""); return;
+      : `Cảm ơn em đã thử! Cú mở thêm <b>bậc ${moMoi} · ${TEN_ON[moMoi - 1]}</b> cho em. Đọc kĩ rồi thử lại nhé.`, "nghi", a === "kiem" ? val : ""); return;
   }
   if (a === "chua"){ if (onSoCho(t)) return; t.thu++; t.luc = nay(); onLuu(); keu("mo");
     const moMoi = Math.min(4, 1 + t.thu); veOn(bai, `Cú mở <b>bậc ${moMoi} · ${TEN_ON[moMoi - 1]}</b> cho em. Đọc kĩ rồi thử trả lời nhé.`); return; }
@@ -1867,7 +1867,7 @@ function veOn(bai, loi, kieu, giu){
   if (c.loai === "chon"){
     tra = `<div class="on-chon">${c.chon.map((x, j) => {
       const thu = t.tried.includes(j), loai = mo >= 3 && c.loaiBo.includes(j) && !t.xong, dung = t.xong && j === c.dung;
-      return `<button data-c="${j}" class="${thu ? "thu" : ""} ${loai ? "loai" : ""} ${dung ? "dung" : ""}" ${thu || loai || t.xong ? "disabled" : ""}><b>${"ABCD"[j]}.</b> ${esc(x)}${loai ? ` <span class="nho">(đã gạch)</span>` : ""}${thu ? ` <span class="nho">(chưa đúng)</span>` : ""}</button>`; }).join("")}</div>`;
+      return `<button data-c="${j}" class="${thu ? "thu" : ""} ${loai ? "loai" : ""} ${dung ? "dung" : ""}" ${thu || loai || t.xong ? "disabled" : ""}><b>${"ABCD"[j]}.</b> ${esc(x)}${loai ? ` <span class="nho">(đã gạch)</span>` : ""}${thu ? ` <span class="nho">(đã thử)</span>` : ""}</button>`; }).join("")}</div>`;
   } else {
     tra = `<div class="on-dien"><input id="onO" autocomplete="off" spellcheck="false" placeholder="Em gõ đáp án vào đây…" value="${esc(t.xong ? c.dapAn[0] : (giu || ""))}" ${t.xong ? "disabled" : ""}>
       <button class="nut" data-a="kiem" ${t.xong ? "disabled" : ""}>✅ Kiểm tra</button></div>`;
